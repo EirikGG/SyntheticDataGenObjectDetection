@@ -1,31 +1,35 @@
-import time
+import time, numpy, statistics
 
-from tools import img_generator, label_generator
+from tools import img_generator
 
-
-
-
-def show_loading(step, max_steps, newline=False, loading_bar_size=50):
+def print_progress(step, max_steps, avg_time, newline=False, loading_bar_size=50):
     '''
     Takes a step and maximum number of steps and show the progress
-    If step is greater than maximum number of steps it raises an exeption
     '''
-    if step > max_steps:            # Raises exception if step is larger than max_steps
-        raise Exception("Step value is greater than maximum steps")
 
                                     # Normalizes the steps
     step_norm = round((step/max_steps)*loading_bar_size)
     
-    print('[{}{}] {}'.format(       # Formates and prints the loading bar
+    print('[{}{}] {} {}'.format(       # Formates and prints the loading bar
         ''.join(["#" for _ in range(step_norm)]), 
         ''.join(["-" for _ in range(step_norm, loading_bar_size)]),
-        'Step {} / {}'.format(step, max_steps)
+        'Step {} / {}'.format(step, max_steps),
+        'Average time per image: {}'.format(avg_time)
     ), end='\n' if newline else '\r')
 
 
-def generate_dataset(n_imgs, show_progress):
-
+def generate_dataset(n_imgs, model, output_path='', show_progress=True):
+    img_generation_times = []
     for i in range(n_imgs):
+        # Generate image and time the process
+        t0 = time.time()
+        
+        img_generator.create_img(model, output_path)
+
+        img_generation_times.append(time.time()-t0)
+
+        # Display progress
         if show_progress:
-            show_loading(i+1, n_imgs)
-        time.sleep(.05)
+            print_progress(i+1, n_imgs, avg_time=round(numpy.mean(img_generation_times), 3))
+    
+    print("\nCreated {} images in {} seconds".format(n_imgs, round(sum(img_generation_times), 3)))
