@@ -11,15 +11,15 @@ def create_img(model):
     Also times and mesures generated image'''
     t0 = time.time()
 
-    scene, model_node = _create_scene(model)                        # Create scene and add
+    scene, model_node = _create_scene(model)                        # Create scene and adds model to it
     scene = _add_lighting(scene)                                    # Add lighting
     scene = _add_camera(scene)                                      # Add camera to scene
+    
+    for axis in ['x', 'y', 'z']:
+        angle = random.uniform(0, 2*math.pi)                        # Find random angle and convert to radians
+        scene = _add_rotation(scene, model_node, angle, axis)
 
     img = _get_img(scene)                                           # Take image
-    
-    pyrender.Viewer(scene, use_raymond_lighting=False)
-    _add_rotation(scene, model_node, 180.0*math.pi/180.0, 'x')
-    pyrender.Viewer(scene, use_raymond_lighting=False)
     
     return {                                                        # Return new image and time to create
         'img': img,
@@ -29,7 +29,7 @@ def create_img(model):
 def _create_scene(model):
     '''Creates a scene'''
     scene = pyrender.Scene()                                        # Creates a scene
-    model_node = scene.add(model)                                   # Adds model and saves node
+    model_node = scene.add(model, pose=np.eye(4))                   # Adds model and saves node
     return scene, model_node
 
 def _add_lighting(scene, r_dir=(0, 2), r_p=(1, 4)):
@@ -76,7 +76,7 @@ def _get_img(scene):
 
 def _add_rotation(scene, model, angle, axis):
     '''Applies a rotation matrix to the model'''
-    mat = None
+    mat = np.eye(4)
     if 'x'==axis:
         mat = np.array([                                            # Rotation matrix for x axis
             [1, 0, 0, 0],
@@ -100,7 +100,7 @@ def _add_rotation(scene, model, angle, axis):
             [0, 0, 1, 0],
             [0, 0, 0, 1] 
         ])
-    scene.set_pose(model, pose=mat)
+    scene = _change_model(scene, model, mat)
     return scene
 
 def _add_translation(scene, model, x=0, y=0, z=0):
@@ -111,5 +111,13 @@ def _add_translation(scene, model, x=0, y=0, z=0):
         [0.0, 0.0, 1.0, z],
         [0.0, 0.0, 0.0, 1.0]
     ])
+    scene = _change_model(scene, model, mat)
+    return scene
+
+def _change_model(scene, model, mat):
+    '''Transposes matrix and applies it to the  model.
+    Using method to avoid transposing multiple places 
+    in the script.'''
+    mat = np.matrix.transpose(mat)
     scene.set_pose(model, pose=mat)
     return scene
