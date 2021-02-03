@@ -13,3 +13,17 @@ def path_from_relative(relative, show_output=False):
         )))
 
     return total
+
+def validate(path) -> bool:
+    return os.path.exists(path)
+
+def create_abs(path):
+    is_abs = os.path.isabs(path)
+    if is_abs:
+        return path
+    else:
+        return path_from_relative(path, show_output=False)
+
+
+if '__main__'==__name__:
+    print(validate('assets/test.glb'))

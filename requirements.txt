@@ -1,4 +1,4 @@
 matplotlib==3.3.3
 numpy==1.19.5
 numpy-stl==2.13.1
-pyrender==0.1.43
+pyrender==0.1.39

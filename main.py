@@ -1,17 +1,16 @@
-import os
+from tools import load_model, visualize, imgs_generator, url
 
-from tools import load_model, visualize_mesh, imgs_generator, url
 
 path = url.path_from_relative('assets/test.obj')
 
 mesh = load_model.load_obj(path)
 
-visualize_mesh.show_obj(mesh)
+#visualize.show_obj(mesh)
 
 imgs_generator.generate_dataset(
-    n_imgs=5, 
+    n_imgs=10, 
     model=mesh, 
-    output_path='', 
+    output_path='out', 
     show_progress=True,
     enable_print=True
-)
+) 
