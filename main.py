@@ -8,7 +8,7 @@ mesh = load_model.load_obj(path)
 #visualize.show_obj(mesh)
 
 imgs_generator.generate_dataset(
-    n_imgs=10, 
+    n_imgs=1, 
     model=mesh, 
     output_path='out', 
     show_progress=True,

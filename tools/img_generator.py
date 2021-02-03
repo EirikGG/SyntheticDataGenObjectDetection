@@ -9,15 +9,17 @@ def create_img(model):
     '''Times and mesures generated image'''
     t0 = time.time()
 
-    scene = _create_scene(model)
-    scene = _add_lighting(scene)
-    scene = _add_camera(scene)
+    scene, model_node = _create_scene(model)                        # Create scene and add
+    scene = _add_lighting(scene)                                    # Add lighting
+    scene = _add_camera(scene)                                      # Add camera to scene
 
-    img = _get_img(scene)
+    img = _get_img(scene)                                           # Take image
     
-    #pyrender.Viewer(scene, use_raymond_lighting=False)
+    pyrender.Viewer(scene, use_raymond_lighting=False)
+    _add_rotation(scene, model_node, 180.0*math.pi/180.0, 'x')
+    pyrender.Viewer(scene, use_raymond_lighting=False)
     
-    return {
+    return {                                                        # Return new image and time to create
         'img': img,
         "time": time.time() - t0
     }
@@ -25,8 +27,8 @@ def create_img(model):
 def _create_scene(model):
     '''Creates a scene'''
     scene = pyrender.Scene()
-    scene.add(model)
-    return scene
+    model_node = scene.add(model)
+    return scene, model_node
 
 def _add_lighting(scene, r_dir=(0, 2), r_p=(1, 4)):
     '''Takes scene and adds random amout of lighting.
@@ -68,3 +70,30 @@ def _get_img(scene):
 
     return img
 
+def _add_rotation(scene, model, angle, axis):
+    mat = None
+    if 'x'==axis:
+        mat = np.array([                                            # Rotation matrix for x axis
+            [1, 0, 0, 0],
+            [0, math.cos(angle), -math.sin(angle), 0],
+            [0, math.sin(angle), math.cos(angle), 0],
+            [0, 0, 0, 1]
+        ])
+
+    elif 'y'==axis:
+        mat = np.array([                                            # Rotation matrix for y axis
+            [math.cos(angle), 0, math.sin(angle), 0],
+            [0, 1, 0, 0],
+            [-math.sin(angle), 0, math.cos(angle), 0],
+            [0, 0, 0, 1]
+        ])
+
+    elif 'z'==axis:
+        mat = np.array([                                            # Rotation matrix for z axis
+            [math.cos(angle), -math.sin(angle), 0, 0],
+            [math.sin(angle), math.cos(angle), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1] 
+        ])
+    scene.set_pose(model, pose=mat)
+    return scene
