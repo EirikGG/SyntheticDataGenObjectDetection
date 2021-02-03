@@ -4,6 +4,7 @@ from PIL import Image
 from tools import img_generator, url
 
 def _save_pil_img(pil_img, folder, name):
+    '''Save PIL image to path'''
     file_path = '\\'.join((folder, name))
     pil_img.save(file_path)
     return os.stat(file_path).st_size
@@ -34,14 +35,9 @@ def generate_dataset(n_imgs, model, output_path='', show_progress=True, enable_p
 
     # Opening print
     if enable_print:
-        print("\n\nCreating dataset of {} images\n".format(
-            n_imgs
-        ))
+        print("\n\nCreating dataset of {} images\n".format(n_imgs))
 
-    info = {
-        "times": [],
-        "sizes":[]
-    }
+    info = {"times": [], "sizes":[]}
 
     for i in range(n_imgs):
         # Generate image

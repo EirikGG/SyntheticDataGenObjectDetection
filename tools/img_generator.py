@@ -6,7 +6,9 @@ from PIL import Image
 
 
 def create_img(model):
-    '''Times and mesures generated image'''
+    '''Takes a model and generates a scene using the model,
+    scene is buildt with random lighting and random orientations.
+    Also times and mesures generated image'''
     t0 = time.time()
 
     scene, model_node = _create_scene(model)                        # Create scene and add
@@ -26,8 +28,8 @@ def create_img(model):
 
 def _create_scene(model):
     '''Creates a scene'''
-    scene = pyrender.Scene()
-    model_node = scene.add(model)
+    scene = pyrender.Scene()                                        # Creates a scene
+    model_node = scene.add(model)                                   # Adds model and saves node
     return scene, model_node
 
 def _add_lighting(scene, r_dir=(0, 2), r_p=(1, 4)):
@@ -48,6 +50,7 @@ def _add_lighting(scene, r_dir=(0, 2), r_p=(1, 4)):
     return scene
 
 def _add_camera(scene):
+    '''Adds a camera to the scene'''
     cam = pyrender.PerspectiveCamera(yfov=np.pi/3.0)                # Create perspective camera
     s = np.sqrt(2)/2
     mat = np.array([                                                # Perspective matrix
@@ -61,6 +64,7 @@ def _add_camera(scene):
     return scene
 
 def _get_img(scene):
+    '''Takes a rendered image from the scene'''
     r = pyrender.OffscreenRenderer(640, 480)                        # Define image size
     color, depth = r.render(scene)                                  # Get image
     r.delete()                                                      # Remove renderer
@@ -71,6 +75,7 @@ def _get_img(scene):
     return img
 
 def _add_rotation(scene, model, angle, axis):
+    '''Applies a rotation matrix to the model'''
     mat = None
     if 'x'==axis:
         mat = np.array([                                            # Rotation matrix for x axis
@@ -95,5 +100,16 @@ def _add_rotation(scene, model, angle, axis):
             [0, 0, 1, 0],
             [0, 0, 0, 1] 
         ])
+    scene.set_pose(model, pose=mat)
+    return scene
+
+def _add_translation(scene, model, x=0, y=0, z=0):
+    '''Applies a translation matrix to the model'''
+    mat = np.array([                                                # Translation matrix
+        [1.0, 0.0, 0.0, x],
+        [0.0, 1.0, 0.0, y],
+        [0.0, 0.0, 1.0, z],
+        [0.0, 0.0, 0.0, 1.0]
+    ])
     scene.set_pose(model, pose=mat)
     return scene
