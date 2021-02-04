@@ -25,11 +25,11 @@ def _print_progress(step, max_steps, avg_time, size, newline=False, loading_bar_
         'Step {} / {}'.format(step, max_steps),
         avg_time,
         size,
-        '                                                 '
+        '                                                 ',
     ), end='\n' if newline else '\r')
 
 
-def generate_dataset(n_imgs, model, output_path='', show_progress=True, enable_print=True):
+def generate_dataset(n_imgs, model, output_path='', rgb=True, depth_image=True, show_progress=True, enable_print=True):
     while not url.validate(output_path):
         output_path = url.create_abs(input('Path: \n{}\nis invalid, input new output path: '.format(output_path)))
 
@@ -45,11 +45,15 @@ def generate_dataset(n_imgs, model, output_path='', show_progress=True, enable_p
     for i in range(n_imgs):
         # Generate image
         result = img_generator.create_img(model)
-        size_rgb = _save_pil_img(result['img'], img_path, ''.join(('image', str(i), '.jpg')))
-        size_dep = _save_pil_img(result['depth'], dep_path, ''.join(('label', str(i), '.jpg')))
+        if rgb:
+            size_rgb = _save_pil_img(result['img'], img_path, ''.join(('image', str(i), '.jpg')))
+            info["sizes"].append(size_rgb)
+        
+        if depth_image:
+            size_dep = _save_pil_img(result['depth'], dep_path, ''.join(('label', str(i), '.jpg')))
+            info["sizes"].append(size_dep)
 
         # Update general information
-        info["sizes"].append(size_rgb+size_dep)
         info["times"].append(result["time"])
 
         # Display progress

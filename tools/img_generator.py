@@ -66,7 +66,10 @@ def _add_camera(scene):
 
 def _get_img(scene):
     '''Takes a rendered image from the scene'''
-    r = pyrender.OffscreenRenderer(640, 480)                        # Define image size
+    r = pyrender.OffscreenRenderer(                                 # Define image size
+        viewport_height=random.randint(400, 1080),
+        viewport_width=random.randint(400, 1920)
+    )                       
     color, depth = r.render(scene)                                  # Get image
     r.delete()                                                      # Remove renderer
 

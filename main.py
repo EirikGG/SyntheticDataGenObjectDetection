@@ -9,8 +9,12 @@ mesh = load_model.load_obj(path)
 
 imgs_generator.generate_dataset(
     n_imgs=100, 
-    model=mesh, 
+    model=mesh,
     output_path='out', 
+    rgb_img=True,
+    depth_img=True,
+
+    
     show_progress=True,
     enable_print=True
 ) 
