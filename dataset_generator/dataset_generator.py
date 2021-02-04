@@ -86,7 +86,11 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
                 'Average time: {}s'.format(round(np.mean(times),3)),
                 'Folder size: {}'.format(humanize.naturalsize(sum(sizes)))
             )), end='\r')
+    print('\n')                                                 # Add newline after loop
 
 
+    if enable_print:                                            # Print ending statement
+        working_dir = os.path.abspath(os.getcwd())
+        print('Dataset saved to folder: {}'.format(os.path.join(working_dir, output_path)))
 
 
