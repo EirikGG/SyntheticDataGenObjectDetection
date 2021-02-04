@@ -24,6 +24,9 @@ def create_abs(path):
     else:
         return path_from_relative(path, show_output=False)
 
+def join_urls(p1, p2):
+    return os.path.join(p1,p2)
+
 
 if '__main__'==__name__:
     print(validate('assets/test.glb'))

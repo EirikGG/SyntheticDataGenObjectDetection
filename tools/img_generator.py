@@ -19,10 +19,11 @@ def create_img(model):
         angle = random.uniform(0, 2*math.pi)                        # Find random angle and convert to radians
         scene = _add_rotation(scene, model_node, angle, axis)
 
-    img = _get_img(scene)                                           # Take image
+    img, depth = _get_img(scene)                                    # Take image
     
     return {                                                        # Return new image and time to create
         'img': img,
+        'depth': depth,
         "time": time.time() - t0
     }
 
@@ -70,9 +71,9 @@ def _get_img(scene):
     r.delete()                                                      # Remove renderer
 
     img = Image.fromarray(color.astype('uint8'), 'RGB')             # Convert from point cloud to pil image
-    depth_img = Image.fromarray(depth.astype('uint8'), 'L') 
+    depth_img = Image.fromarray(np.uint8(depth*255), 'L')           # Convert from 2d array to pil image
 
-    return img
+    return img, depth_img
 
 def _add_rotation(scene, model, angle, axis):
     '''Applies a rotation matrix to the model'''

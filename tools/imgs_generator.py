@@ -33,6 +33,9 @@ def generate_dataset(n_imgs, model, output_path='', show_progress=True, enable_p
     while not url.validate(output_path):
         output_path = url.create_abs(input('Path: \n{}\nis invalid, input new output path: '.format(output_path)))
 
+    img_path = url.join_urls(output_path, "images")
+    dep_path = url.join_urls(output_path, "depth")
+
     # Opening print
     if enable_print:
         print("\n\nCreating dataset of {} images\n".format(n_imgs))
@@ -42,10 +45,11 @@ def generate_dataset(n_imgs, model, output_path='', show_progress=True, enable_p
     for i in range(n_imgs):
         # Generate image
         result = img_generator.create_img(model)
-        size = _save_pil_img(result['img'], output_path, ''.join(('image', str(i), '.jpg')))
+        size_rgb = _save_pil_img(result['img'], img_path, ''.join(('image', str(i), '.jpg')))
+        size_dep = _save_pil_img(result['depth'], dep_path, ''.join(('label', str(i), '.jpg')))
 
         # Update general information
-        info["sizes"].append(size)
+        info["sizes"].append(size_rgb+size_dep)
         info["times"].append(result["time"])
 
         # Display progress
