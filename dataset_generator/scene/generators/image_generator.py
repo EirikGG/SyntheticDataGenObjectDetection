@@ -2,7 +2,7 @@ import pyrender, random
 
 from PIL import Image
 
-def _get_img(scene, renderer):
+def get_img(scene, renderer):
     '''Takes a rendered image from the scene'''
     color, _ = renderer.render(scene)                               # Get image
 

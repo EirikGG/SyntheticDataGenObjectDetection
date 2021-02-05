@@ -1,7 +1,7 @@
 import pyrender, trimesh, random
 
 from dataset_generator.scene import scene_generator
-from dataset_generator.scene.generators import image_generator, depth_generator, label_generator, seg_generator
+from dataset_generator.scene.generators import image_generator, depth_generator, box_generator, seg_generator
 
 class Scene_Handler():
     _model = None
@@ -29,10 +29,14 @@ class Scene_Handler():
 
     def get_img(self):
         '''Returns an image'''
-        return image_generator._get_img(self._scene, self._renderer)
+        return image_generator.get_img(self._scene, self._renderer)
 
     def get_depth(self):
         '''Returns an image'''
-        return depth_generator._get_depth(self._scene, self._renderer)
+        return depth_generator.get_depth(self._scene, self._renderer)
+
+    def get_box(self):
+        '''Returns a box label of object'''
+        return box_generator.get_box(self._scene, self._renderer, self._model)
 
     

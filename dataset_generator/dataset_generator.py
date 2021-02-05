@@ -7,17 +7,19 @@ from dataset_generator.tools import loader, saver, visualizer
 
 def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=True, 
                         box_label=True, seg_label=True, show_progress=True, 
-                        enable_print=True, img_visualizer=False):
+                        enable_print=True, img_visualizer=False, n_preview_images=2):
     '''Loops trough number of images, generates a new image and saves the results.
-    n_imgs:         number of images to create
-    model_path:     path to main model
-    output_path:    Results are written in subfolders of output_path
-    rgb: Create     rgb images
-    depth_image:    Create depth images
-    box_label:      Create box labels
-    seg_label=      Create seqmentation labels
-    show_progress:  Print progress while generating
-    enable_print:   Enable disable all prints, overwrites "show progress"'''
+    n_imgs:             number of images to create
+    model_path:         path to main model
+    output_path:        Results are written in subfolders of output_path
+    rgb:                Create rgb images
+    depth_image:        Create depth images
+    box_label:          Create box labels
+    seg_label:          Create seqmentation labels
+    show_progress:      Print progress while generating
+    enable_print:       Enable disable all prints, overwrites "show progress"
+    img_visualizer:     Enable image preview 
+    n_preview_images:   Number of images to previou'''
     if not os.path.isfile(model_path):                          # Ensures that model path points to file
         raise Exception("Model path dont point to a file: {}".format(path))
 
@@ -49,8 +51,8 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
             'Output path:                   {}'.format(output_path),
             'Create rgb images:             {}'.format(rgb_img),
             'Create depth images:           {}'.format(depth_img),
-            'Create segmentation lables:    {}'.format(box_label),
-            'Create box labels:             {}'.format(seg_label),
+            'Create segmentation lables:    {}'.format(seg_label),
+            'Create box labels:             {}'.format(box_label),
             'Show progress:                 {}'.format(show_progress),
             '\n'
         )))
@@ -87,7 +89,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
             sizes = np.append(sizes, size)
 
         if box_label:                                           # Box labels
-            pass
+            box = s_handler.get_box()
 
         if seg_label:                                           # Seqmentation labels
             pass
@@ -96,6 +98,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
 
         if show_progress and enable_print:                      # Print update
             loading_bar_size = 50
+            avg_time = round(np.mean(times), 3)
             step_norm = round(((i+1)/n_imgs)*loading_bar_size)
             print(', '.join((
                 '[{}{}]'.format(
@@ -103,19 +106,26 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
                     ''.join(["-" for _ in range(step_norm, loading_bar_size)])
                 ),
                 'Step {} / {}'.format(i+1, n_imgs),
-                'Average time: {}s'.format(round(np.mean(times),3)),
-                'Folder size: {}'.format(humanize.naturalsize(sum(sizes)))
-            )), end='\r')
+                'Average time: {}s'.format(avg_time),
+                'Remaining time: {}s'.format(round(avg_time * (n_imgs - i - 1), 3)),
+                'Folder size: {}'.format(humanize.naturalsize(sum(sizes))),
+            )), end='{}{}'.format(''.join([' 'for _ in range(10)]), '\r'))
     print('\n')                                                 # Add newline after loop
 
 
     if enable_print:                                            # Print ending statement
         working_dir = os.path.abspath(os.getcwd())
-        print('Dataset saved to folder: {}'.format(os.path.join(working_dir, output_path)))
+        print('\n'.join((
+            'Finished in:                   {}s'.format(round(sum(times),3)),
+            'Saved to folder:               {}'.format(os.path.join(working_dir, output_path)),
+            'Dataset size:                  {}'.format(humanize.naturalsize(sum(sizes))),
+            '',
+            'Starting image preview of {} image(s):'.format(n_preview_images),
+        ))) 
 
 
     if img_visualizer:                                          # Show random selection of images
         visualizer.show_images((
             os.path.join(output_path, image_dir),
             os.path.join(output_path, depth_dir)
-        ), n = 2)
+        ), n = n_preview_images)

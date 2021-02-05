@@ -2,7 +2,7 @@ import numpy as np
 
 from PIL import Image
 
-def _get_depth(scene, renderer):
+def get_depth(scene, renderer):
     '''Takes a rendered image from the scene'''
     _, depth = renderer.render(scene)                               # Get image
 
