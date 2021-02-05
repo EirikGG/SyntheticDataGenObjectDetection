@@ -3,22 +3,42 @@ import os, humanize, time
 import numpy as np
 
 from dataset_generator.scene import scene_handler
-from dataset_generator.tools import loader, saver
+from dataset_generator.tools import loader, saver, visualizer
 
-def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=True, box_label=True, seg_label=True, show_progress=True, enable_print=True):
+def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=True, 
+                        box_label=True, seg_label=True, show_progress=True, 
+                        enable_print=True, img_visualizer=False):
     '''Loops trough number of images, generates a new image and saves the results.
-    n_imgs: number of images to create
-    model_path: path to model
-    output_path: Results are written in subfolders
-    rgb: Create rgb images
-    depth_image: Create depth images
-    show_progress: Print progress while generating
-    enable_print: Enable disable all prints, overwrites "show progress"'''
+    n_imgs:         number of images to create
+    model_path:     path to main model
+    output_path:    Results are written in subfolders of output_path
+    rgb: Create     rgb images
+    depth_image:    Create depth images
+    box_label:      Create box labels
+    seg_label=      Create seqmentation labels
+    show_progress:  Print progress while generating
+    enable_print:   Enable disable all prints, overwrites "show progress"'''
     if not os.path.isfile(model_path):                          # Ensures that model path points to file
         raise Exception("Model path dont point to a file: {}".format(path))
 
     if not os.path.isdir(output_path):                          # Ensures that output folder path is folder
-        raise Exception("Output path is not a directory:\n{}".format(output_path))
+        raise Exception('Output path is not a directory: {}'.format(output_path))
+
+    image_dir = 'images'                                        # Ensure image folder exists
+    if rgb_img and not os.path.isdir(os.path.join(output_path, image_dir)):
+        raise Exception('Missing "{}" output folder'.format(image_dir))
+
+    depth_dir = 'depth'                                         # Ensure depth image folder exists
+    if depth_img and not os.path.isdir(os.path.join(output_path, depth_dir)):
+        raise Exception('Missing "{}" output folder'.format(depth_dir))
+
+    box_dir = 'box'                                             # Ensure box label folder exists
+    if box_label and not os.path.isdir(os.path.join(output_path, box_dir)):
+        raise Exception('Missing "{}" output folder'.format(box_dir))
+    
+    seg_dir = 'seg'                                             # Ensure depth image folder exists
+    if seg_label and not os.path.isdir(os.path.join(output_path, seg_dir)):
+        raise Exception('Missing "{}" output folder'.format(seg_dir))
 
     if enable_print:                                            # Print configuration
         print('\n'.join((
@@ -52,7 +72,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
             img = s_handler.get_img()
             size = saver._save_pil_img(
                 pil_img=img,
-                folder=os.path.join(output_path, 'images'),
+                folder=os.path.join(output_path, image_dir),
                 name='image{}.jpg'.format(i)
             )
             sizes = np.append(sizes, size)
@@ -61,7 +81,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
             img = s_handler.get_depth()
             size = saver._save_pil_img(
                 pil_img=img,
-                folder=os.path.join(output_path, 'depth'),
+                folder=os.path.join(output_path, depth_dir),
                 name='depth{}.jpg'.format(i)
             )
             sizes = np.append(sizes, size)
@@ -94,3 +114,8 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
         print('Dataset saved to folder: {}'.format(os.path.join(working_dir, output_path)))
 
 
+    if img_visualizer:                                          # Show random selection of images
+        visualizer.show_images((
+            os.path.join(output_path, image_dir),
+            os.path.join(output_path, depth_dir)
+        ), n = 2)
