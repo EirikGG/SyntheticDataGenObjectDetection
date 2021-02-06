@@ -10,7 +10,7 @@ def generate_random_scene(model):
     for l_type in ['directional_lights', 'point_lights']:       # Adds light to the scene
         scene = _add_lighting(scene, light_type=l_type)
 
-    scene = _add_camera(scene)                                  # Add camera
+    scene, cam = _add_camera(scene)                             # Add camera
 
     for axis in ['x', 'y', 'z']:                                # Adds rotation about all three axises
         scene = _add_rotation(                                  
@@ -20,7 +20,9 @@ def generate_random_scene(model):
             axis
         )
 
-    return scene
+    pyrender.Viewer(scene)
+
+    return scene, model_node, cam
 
 def _add_model(scene, model, pose=np.eye(4)):
     '''Adds a model to the scene, default position is origin.
@@ -52,17 +54,23 @@ def _add_lighting(scene, light_type, random_range=(1, 4)):
 
 def _add_camera(scene):
     '''Adds a camera to the scene'''
-    cam = pyrender.PerspectiveCamera(yfov=np.pi/3.0)            # Create perspective camera
-    s = np.sqrt(2)/2
-    mat = np.array([                                            # Perspective matrix
-        [0.0, -s, s, 0.3],
-        [1.0, 0.0, 0.0, 0.0],
-        [0.0, s, s, 0.35],
-        [0.0, 0.0, 0.0, 1.0]
-    ])
+    cam = pyrender.PerspectiveCamera(                           # Create perspective camera
+        yfov=np.pi/3.0
+    )
 
-    scene.add(cam, pose=mat)                                    # Add camera to scene
-    return scene
+    cam = scene.add(cam)                                        # Add camera to scene
+
+    a_x = random.uniform(-.5, .5)                               # Random x angle
+    a_y = random.uniform(-.5, .5)                               # Random y angle
+
+    scene = _add_rotation(scene, cam, a_y, 'y')                 # Add rotation
+    scene = _add_rotation(scene, cam, a_x, 'x')
+
+    t_z = random.uniform(.5, 1.5)                               # Random translation
+
+    scene = _add_translation(scene, cam, z=t_z)                 # Add translation
+
+    return scene, cam
 
 def _add_rotation(scene, model, angle, axis):
     '''Applies a rotation matrix to the model'''
@@ -93,22 +101,22 @@ def _add_rotation(scene, model, angle, axis):
     scene = _update_model(scene, model, mat)
     return scene
 
-def _update_model(scene, model, mat):
-    '''Transposes matrix and applies it to the  model.
-    Using method to avoid transposing multiple places 
-    in the script.'''
-    mat = np.matrix.transpose(mat)
-    scene.set_pose(model, pose=mat)
-    return scene
-
 
 def _add_translation(scene, model, x=0, y=0, z=0):
     '''Applies a translation matrix to the model'''
     mat = np.array([                                            # Translation matrix
-        [1.0, 0.0, 0.0, x],
-        [0.0, 1.0, 0.0, y],
-        [0.0, 0.0, 1.0, z],
-        [0.0, 0.0, 0.0, 1.0]
+        [1, 0, 0, x],
+        [0, 1, 0, y],
+        [0, 0, 1, z],
+        [0, 0, 0, 1]
     ])
     scene = _update_model(scene, model, mat)
+    return scene
+
+def _update_model(scene, model, mat):
+    '''Transposes matrix and applies it to the  model.
+    Using method to avoid transposing multiple places 
+    in the script.'''
+    old = scene.get_pose(model)
+    scene.set_pose(model, pose=np.matmul(mat, old))
     return scene
