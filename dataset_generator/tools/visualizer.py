@@ -5,8 +5,6 @@ import matplotlib.patches as patches
 
 from PIL import Image
 
-# https://matplotlib.org/3.1.1/gallery/widgets/buttons.html
-# https://matplotlib.org/examples/pylab_examples/subplots_demo.html#pylab-examples-subplots-demo
 
 def get_full_path(p):
     return os.path.join(os.getcwd(), p)
