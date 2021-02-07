@@ -25,7 +25,6 @@ def show_images(img_path=None, depth_path=None, box_path=None, seg_path=None, n=
             box = os.listdir(box_p)[0]
             with open(os.path.join(box_p, box)) as f:
                 data = dict(json.load(f))
-                print(data)
             
             rect = patches.Rectangle((data['x'], data['y']), 100,100,linewidth=1,edgecolor='r',facecolor='none')
             axarr[0].add_patch(rect)
