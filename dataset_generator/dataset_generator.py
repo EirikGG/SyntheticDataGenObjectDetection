@@ -93,7 +93,9 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
             sizes = np.append(sizes, size)
 
         if box_label:                                           # Box labels
-            box = s_handler.get_box()
+            box = s_handler.get_box(
+                class_name=model_name
+            )
             size = saver.save_json(
                 dic=box,
                 folder=os.path.join(output_path, box_dir),
