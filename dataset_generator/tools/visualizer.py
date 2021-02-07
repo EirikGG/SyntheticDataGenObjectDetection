@@ -29,6 +29,7 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
         img = imgs[i]                                               # Picked image
 
         axarr[0, 0].imshow(plt.imread(os.path.join(img_path, img))) # Add image to first subplot
+        axarr[0, 0].title.set_text('Image: {}'.format(img))         # Add title to subplot
 
         if box_path:
             axarr[1, 0].imshow(plt.imread(os.path.join(img_path, img)))
@@ -39,14 +40,15 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
                 data = dict(json.load(f))                           # Load text
             
             rect = patches.Rectangle(                               # Create new rectangle
-                (data['x'], data['y']), 
-                100,
-                100,
+                (data['x'], data['y']),
+                data['h'],
+                data['w'],
                 linewidth=1,
                 edgecolor='r',
                 facecolor='none'
             )
             axarr[1, 0].add_patch(rect)                             # Add rectangle to subplot
+            axarr[1, 0].title.set_text('Box label: {}'.format(box)) # Add title to subplot
 
         if depth_path:                                              # Print deph image
             dp = get_full_path(depth_path)                          # Depth image folder
@@ -56,7 +58,8 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
                 cmap='gray',
                 vmin=0,
                 vmax=255
-            )
+            )                                                       # Add title to subplot
+            axarr[0, 1].title.set_text('Depth image: {}'.format(depth_img))
             
     plt.show()                                                      # Show figure
     

@@ -35,8 +35,8 @@ def get_box(scene, renderer, model_node):
     result = {
         'x': ((p1[0] + 1)/2)*width,
         'y': height - ((p1[1] + 1)/2)*height,
-        'h': 1,
-        'w': 1,
+        'h': 50,
+        'w': 50,
     }
 
     return result
