@@ -5,8 +5,8 @@ import numpy as np
 from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
-def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=True, 
-                        box_label=True, seg_label=True, show_progress=True, 
+def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb_img=True, 
+                        depth_img=True, box_label=True, seg_label=True, show_progress=True, 
                         enable_print=True, img_visualizer=False, n_preview_images=2):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
@@ -72,7 +72,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
 
         if rgb_img:                                             # RGB images
             img = s_handler.get_img()
-            size = saver._save_pil_img(
+            size = saver.save_pil_img(
                 pil_img=img,
                 folder=os.path.join(output_path, image_dir),
                 name='image{}.jpg'.format(i)
@@ -81,7 +81,7 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
             
         if depth_img:                                           # Depth images
             img = s_handler.get_depth()
-            size = saver._save_pil_img(
+            size = saver.save_pil_img(
                 pil_img=img,
                 folder=os.path.join(output_path, depth_dir),
                 name='depth{}.jpg'.format(i)
@@ -90,6 +90,12 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
 
         if box_label:                                           # Box labels
             box = s_handler.get_box()
+            size = saver.save_json(
+                dic=box,
+                folder=os.path.join(output_path, box_dir),
+                name='box{}.txt'.format(i)
+            )
+            sizes = np.append(sizes, size)
 
         if seg_label:                                           # Seqmentation labels
             pass
@@ -110,22 +116,27 @@ def generate_dataset(n_imgs, model_path, output_path, rgb_img=True, depth_img=Tr
                 'Remaining time: {}s'.format(round(avg_time * (n_imgs - i - 1), 3)),
                 'Folder size: {}'.format(humanize.naturalsize(sum(sizes))),
             )), end='{}{}'.format(''.join([' 'for _ in range(10)]), '\r'))
-    print('\n')                                                 # Add newline after loop
 
 
     if enable_print:                                            # Print ending statement
         working_dir = os.path.abspath(os.getcwd())
         print('\n'.join((
-            'Finished in:                   {}s'.format(round(sum(times),3)),
-            'Saved to folder:               {}'.format(os.path.join(working_dir, output_path)),
+            '\n',
+            'Finished in:                   {}s'.format(round(sum(times))),
             'Dataset size:                  {}'.format(humanize.naturalsize(sum(sizes))),
+            'Saved to folder:               {}'.format(os.path.join(working_dir, output_path)),
             '',
-            'Starting image preview of {} image(s):'.format(n_preview_images),
         ))) 
 
 
     if img_visualizer:                                          # Show random selection of images
-        visualizer.show_images((
-            os.path.join(output_path, image_dir),
-            os.path.join(output_path, depth_dir)
-        ), n = n_preview_images)
+        print('Starting image preview of {} image(s):'.format(n_preview_images))
+        visualizer.show_images(
+            img_path=os.path.join(output_path, image_dir) if rgb_img else None,
+            depth_path=os.path.join(output_path, depth_dir) if depth_img else None,
+
+            box_path=os.path.join(output_path, box_dir) if box_label else None,
+            seg_path=os.path.join(output_path, seg_dir) if seg_label else None,
+
+            n = n_preview_images
+        )

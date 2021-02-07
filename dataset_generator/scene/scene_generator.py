@@ -11,7 +11,7 @@ def generate_random_scene(model):
         scene = _add_lighting(scene, light_type=l_type)
 
     scene, cam = _add_camera(scene)                             # Add camera
-
+    '''
     for axis in ['x', 'y', 'z']:                                # Adds rotation about all three axises
         scene = _add_rotation(                                  
             scene,  
@@ -19,8 +19,9 @@ def generate_random_scene(model):
             random.uniform(0, 2*math.pi),                       # Find random angle and convert to radians
             axis
         )
+    '''
 
-    pyrender.Viewer(scene)
+    #pyrender.Viewer(scene)
 
     return scene, model_node, cam
 
@@ -28,6 +29,18 @@ def _add_model(scene, model, pose=np.eye(4)):
     '''Adds a model to the scene, default position is origin.
     Returns scene and models node.'''
     node = scene.add(model, pose=pose)
+
+    a_x = random.uniform(-.5, .5)                               # Random x angle
+    a_y = random.uniform(-.5, .5)                               # Random y angle
+
+    scene = _add_rotation(scene, node, a_y, 'y')                # Add rotation
+    scene = _add_rotation(scene, node, a_x, 'x')
+
+    t_z = random.uniform(.5, 1.5)                               # Random translation
+    t_x = random.uniform(-.4, .4)
+    t_y = random.uniform(-.4, .4)
+
+    scene = _add_translation(scene, node, x=t_x, y=t_y, z=-t_z) # Add translation
     return scene, node
 
 def _add_lighting(scene, light_type, random_range=(1, 4)):
@@ -55,20 +68,12 @@ def _add_lighting(scene, light_type, random_range=(1, 4)):
 def _add_camera(scene):
     '''Adds a camera to the scene'''
     cam = pyrender.PerspectiveCamera(                           # Create perspective camera
-        yfov=np.pi/3.0
+        yfov=np.pi/3.0,
+        znear = 0.05,
+        zfar=10
     )
 
     cam = scene.add(cam)                                        # Add camera to scene
-
-    a_x = random.uniform(-.5, .5)                               # Random x angle
-    a_y = random.uniform(-.5, .5)                               # Random y angle
-
-    scene = _add_rotation(scene, cam, a_y, 'y')                 # Add rotation
-    scene = _add_rotation(scene, cam, a_x, 'x')
-
-    t_z = random.uniform(.5, 1.5)                               # Random translation
-
-    scene = _add_translation(scene, cam, z=t_z)                 # Add translation
 
     return scene, cam
 

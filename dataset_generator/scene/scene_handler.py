@@ -5,8 +5,11 @@ from dataset_generator.scene.generators import image_generator, depth_generator,
 
 class Scene_Handler():
     _model = None
+    _model_node = None
     _scene = None
     _renderer = None
+    _camera = None
+    
 
     def __init__(self, model):
         '''Loads model and generates a random scene'''
@@ -14,7 +17,7 @@ class Scene_Handler():
 
     def generate_new_random_scene(self):
         '''Generates a new random scene and adds it to object field''' 
-        self._scene = scene_generator.generate_random_scene(self._model)
+        self._scene, self._model_node, self._camera = scene_generator.generate_random_scene(self._model)
         self._generate_new_renderer()
 
     def _generate_new_renderer(self):
@@ -37,6 +40,6 @@ class Scene_Handler():
 
     def get_box(self):
         '''Returns a box label of object'''
-        return box_generator.get_box(self._scene, self._renderer, self._model)
+        return box_generator.get_box(self._scene, self._camera, self._renderer, self._model_node)
 
     
