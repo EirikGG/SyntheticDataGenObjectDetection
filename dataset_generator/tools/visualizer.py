@@ -11,45 +11,55 @@ from PIL import Image
 def get_full_path(p):
     return os.path.join(os.getcwd(), p)
 
-def show_images(img_path=None, depth_path=None, box_path=None, seg_path=None, n=3):
+def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
     '''Displays n random images'''
-    row, col = 1, 2
-    f, axarr = plt.subplots(row, col)
+    row, col = 2, 2 
+    
+    imgs_path = get_full_path(img_path)                             # Full path to image directory
+    imgs = os.listdir(imgs_path)                                    # List images in directory
 
-    if img_path:
-        path = get_full_path(img_path)
-        img = os.listdir(path)[0]
-        axarr[0].imshow(plt.imread(os.path.join(path, img)))
+    for i in random.choices(range(len(imgs)), k=n):                 # Loop trough n random picked image indecies
+
+        f, axarr = plt.subplots(                                    # Create empty figure
+            row, 
+            col,
+            figsize=(15, 10)
+        )
+        
+        img = imgs[i]                                               # Picked image
+
+        axarr[0, 0].imshow(plt.imread(os.path.join(img_path, img))) # Add image to first subplot
+
         if box_path:
-            box_p = get_full_path(box_path)
-            box = os.listdir(box_p)[0]
-            with open(os.path.join(box_p, box)) as f:
-                data = dict(json.load(f))
+            axarr[1, 0].imshow(plt.imread(os.path.join(img_path, img)))
+
+            bp = get_full_path(box_path)                            # Path to box dir
+            box = os.listdir(bp)[i]                                 # Pick same box as image
+            with open(os.path.join(bp, box)) as f:                  # Read file
+                data = dict(json.load(f))                           # Load text
             
-            rect = patches.Rectangle((data['x'], data['y']), 100,100,linewidth=1,edgecolor='r',facecolor='none')
-            axarr[0].add_patch(rect)
-
-    if depth_path:
-        dept = get_full_path(depth_path)
-        img = os.listdir(dept)[0]
-        axarr[1].imshow(plt.imread(os.path.join(dept, img)))
-
-
-    plt.show()
-    '''
-    for imgs in random.choices(list(zip(*map(os.listdir, dirs))), k=n):
-        f, axarr = plt.subplots(1, len(imgs))
-        for i, img in enumerate(imgs):
-            path = os.path.join(
-                os.path.abspath(
-                    os.getcwd()),
-                    os.path.join(dirs[i],
-                    img
-                )
+            rect = patches.Rectangle(                               # Create new rectangle
+                (data['x'], data['y']), 
+                100,
+                100,
+                linewidth=1,
+                edgecolor='r',
+                facecolor='none'
             )
-            axarr[i].imshow(plt.imread(path))
-        plt.show()
-    '''
+            axarr[1, 0].add_patch(rect)                             # Add rectangle to subplot
+
+        if depth_path:                                              # Print deph image
+            dp = get_full_path(depth_path)                          # Depth image folder
+            depth_img = os.listdir(dp)[i]                           # Pick image
+            axarr[0, 1].imshow(                                     # Add to subplot
+                plt.imread(os.path.join(dp, depth_img)),
+                cmap='gray',
+                vmin=0,
+                vmax=255
+            )
+            
+    plt.show()                                                      # Show figure
+    
 
 
 if '__main__'==__name__:

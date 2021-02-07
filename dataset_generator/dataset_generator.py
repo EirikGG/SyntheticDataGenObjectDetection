@@ -5,7 +5,7 @@ import numpy as np
 from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
-def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb_img=True, 
+def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', 
                         depth_img=True, box_label=True, seg_label=True, show_progress=True, 
                         enable_print=True, img_visualizer=False, n_preview_images=2):
     '''Loops trough number of images, generates a new image and saves the results.
@@ -20,14 +20,19 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb
     enable_print:       Enable disable all prints, overwrites "show progress"
     img_visualizer:     Enable image preview 
     n_preview_images:   Number of images to previou'''
+
+
+    if 0 >= n_imgs or not type(n_imgs) == int:                  # Number of images should be int and positive
+        raise Exception('Number of images should be greater than zero and an integer, not {}'.format(n_imgs))
+
     if not os.path.isfile(model_path):                          # Ensures that model path points to file
-        raise Exception("Model path dont point to a file: {}".format(path))
+        raise Exception('Model path dont point to a file: {}'.format(path))
 
     if not os.path.isdir(output_path):                          # Ensures that output folder path is folder
         raise Exception('Output path is not a directory: {}'.format(output_path))
 
     image_dir = 'images'                                        # Ensure image folder exists
-    if rgb_img and not os.path.isdir(os.path.join(output_path, image_dir)):
+    if not os.path.isdir(os.path.join(output_path, image_dir)):
         raise Exception('Missing "{}" output folder'.format(image_dir))
 
     depth_dir = 'depth'                                         # Ensure depth image folder exists
@@ -49,7 +54,6 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb
             'Number of images:              {}'.format(n_imgs),
             'Model path:                    {}'.format(model_path),
             'Output path:                   {}'.format(output_path),
-            'Create rgb images:             {}'.format(rgb_img),
             'Create depth images:           {}'.format(depth_img),
             'Create segmentation lables:    {}'.format(seg_label),
             'Create box labels:             {}'.format(box_label),
@@ -70,7 +74,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb
 
         s_handler.generate_new_random_scene()                   # Generate new random scene
 
-        if rgb_img:                                             # RGB images
+        if True:                                                # RGB images
             img = s_handler.get_img()
             size = saver.save_pil_img(
                 pil_img=img,
@@ -129,10 +133,26 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', rgb
         ))) 
 
 
-    if img_visualizer:                                          # Show random selection of images
+    user_conf = True                                            # User confirmation flag
+    if 5 < n_preview_images:
+        while True:                                             # Warn user that each preview image opens a window
+            user_msg = input(('Are you sure you want to display {} images,' 
+                            ' this would open {} separate windows.'
+                            ' (yes/no): ').format(
+                n_preview_images,
+                n_preview_images
+            ))
+            if user_msg in ('yes', 'y'):
+                break
+            elif user_msg in ('no', 'n'):
+                user_conf = False
+                break
+
+    if img_visualizer and user_conf:                            # Show random selection of images
+
         print('Starting image preview of {} image(s):'.format(n_preview_images))
         visualizer.show_images(
-            img_path=os.path.join(output_path, image_dir) if rgb_img else None,
+            img_path=os.path.join(output_path, image_dir),
             depth_path=os.path.join(output_path, depth_dir) if depth_img else None,
 
             box_path=os.path.join(output_path, box_dir) if box_label else None,
