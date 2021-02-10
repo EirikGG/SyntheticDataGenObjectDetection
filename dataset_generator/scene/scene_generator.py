@@ -11,17 +11,6 @@ def generate_random_scene(model):
         scene = _add_lighting(scene, light_type=l_type)
 
     scene, cam = _add_camera(scene)                             # Add camera
-    '''
-    for axis in ['x', 'y', 'z']:                                # Adds rotation about all three axises
-        scene = _add_rotation(                                  
-            scene,  
-            model_node,
-            random.uniform(0, 2*math.pi),                       # Find random angle and convert to radians
-            axis
-        )
-    '''
-
-    #pyrender.Viewer(scene)
 
     return scene, model_node, cam
 

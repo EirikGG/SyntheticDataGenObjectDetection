@@ -7,7 +7,9 @@ from dataset_generator.tools import loader, saver, visualizer
 
 def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', 
                         depth_img=True, box_label=True, seg_label=True, show_progress=True, 
-                        enable_print=True, img_visualizer=False, n_preview_images=2):
+                        enable_print=True, img_visualizer=False, n_preview_images=2,
+                        image_dir = 'images', depth_dir = 'depth', box_dir = 'box',
+                        seg_dir = 'seg'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
     model_path:         path to main model
@@ -19,7 +21,11 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
     show_progress:      Print progress while generating
     enable_print:       Enable disable all prints, overwrites "show progress"
     img_visualizer:     Enable image preview 
-    n_preview_images:   Number of images to previou'''
+    n_preview_images:   Number of images to previou
+    image_dir:          Name of output subfolder for images
+    depth_dir:          Name of output subfolder for depth images
+    box_dir:            Name of output subfolder for box labels
+    seg_dir:            Name of output subfolder for segementation labels'''
 
 
     if 0 >= n_imgs or not type(n_imgs) == int:                  # Number of images should be int and positive
@@ -30,20 +36,19 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
 
     if not os.path.isdir(output_path):                          # Ensures that output folder path is folder
         raise Exception('Output path is not a directory: {}'.format(output_path))
-
-    image_dir = 'images'                                        # Ensure image folder exists
-    if not os.path.isdir(os.path.join(output_path, image_dir)):
+    
+    if not os.path.isdir(os.path.join(output_path, image_dir)): # Ensure image folder exists
         raise Exception('Missing "{}" output folder'.format(image_dir))
 
-    depth_dir = 'depth'                                         # Ensure depth image folder exists
+                                                                # Ensure depth image folder exists
     if depth_img and not os.path.isdir(os.path.join(output_path, depth_dir)):
         raise Exception('Missing "{}" output folder'.format(depth_dir))
 
-    box_dir = 'box'                                             # Ensure box label folder exists
+                                                                # Ensure box label folder exists
     if box_label and not os.path.isdir(os.path.join(output_path, box_dir)):
         raise Exception('Missing "{}" output folder'.format(box_dir))
     
-    seg_dir = 'seg'                                             # Ensure depth image folder exists
+                                                                # Ensure depth image folder exists
     if seg_label and not os.path.isdir(os.path.join(output_path, seg_dir)):
         raise Exception('Missing "{}" output folder'.format(seg_dir))
 

@@ -35,12 +35,12 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
             bp = get_full_path(box_path)                            # Path to box dir
             box = os.listdir(bp)[i]                                 # Pick same box as image
             with open(os.path.join(bp, box)) as f:                  # Read file
-                data = dict(json.load(f))                           # Load text
+                data = json.load(f).split()                         # Load text
             
             rect = patches.Rectangle(                               # Create new rectangle
-                (data['x'], data['y']),
-                data['h'],
-                data['w'],
+                (int(data[4]), int(data[5])),
+                int(data[6]) - int(data[4]),                        # Width
+                int(data[7]) - int(data[5]),                        # Height
                 linewidth=1,
                 edgecolor='r',
                 facecolor='none'
