@@ -19,19 +19,19 @@ def get_box(scene, renderer, model_node, class_name):
 
 
     obj_pose = scene.get_pose(model_node)                       # Object world pose
-    obj_p = np.array(((                                         # Object center point(column vector)
+    obj_p = np.array((                                          # Object center point(column vector)
         obj_pose[0][3],
         obj_pose[1][3],
         obj_pose[2][3],
-        0
-    )))
+        1
+    ))
 
     b = model_node.mesh.bounds                                  # Bounds on local coordinates
 
     p1 = np.append(b[0], 0) + obj_p                             # 8 corners in bounding box
     p2 = p1 + (abs(b[0][0]) + abs(b[1][0]), 0, 0, 0)
     p3 = p1 + (0, abs(b[0][1]) + abs(b[1][1]), 0, 0)
-    p4 = p1 + (0, 0, abs(b[0][2]) + abs(b[1][2]), 0)
+    p4 = p1 + (0, 0, -abs(b[0][2]) - abs(b[1][2]), 0)
     p5 = p4 + (abs(b[0][0]) + abs(b[1][0]), 0, 0, 0)
     p6 = p4 + (0, abs(b[0][1]) + abs(b[1][1]), 0, 0)
     p7 = p4 + (0, 0, abs(b[0][2]) + abs(b[1][2]), 0)
@@ -39,9 +39,7 @@ def get_box(scene, renderer, model_node, class_name):
     l, r, t, b = math.inf, -math.inf, math.inf, -math.inf
     for p in (p1, p2, p3, p4, p5, p6, p7):                      # Find outer points
         p_2d = np.dot(p, projection_mat)
-        print(p_2d)
         p_2d = p_2d / p_2d[-2]
-        print(p_2d)
 
         x = round(((p_2d[0] + 1)/2)*width)
         if l > x:

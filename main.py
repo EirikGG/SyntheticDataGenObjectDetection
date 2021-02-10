@@ -14,4 +14,4 @@ dataset_generator.generate_dataset(
 
     img_visualizer=True,
     n_preview_images=2,
-) 
+)
