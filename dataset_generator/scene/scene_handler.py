@@ -18,7 +18,7 @@ class Scene_Handler():
     def generate_new_random_scene(self):
         '''Generates a new random scene and adds it to object field''' 
         self._scene, self._model_node, self._camera = scene_generator.generate_random_scene(self._model)
-        self._generate_new_renderer()
+        # self._generate_new_renderer()
 
     def _generate_new_renderer(self):
         '''Deletes previous renderer and creates a new one with random 
@@ -26,9 +26,23 @@ class Scene_Handler():
         if self._renderer:                                              # Delete previous renderer
             self._renderer.delete()
         self._renderer = pyrender.OffscreenRenderer(                    # Define image size
-            viewport_height=random.randint(400, 1080),
-            viewport_width=random.randint(400, 1920)
-        )    
+            viewport_height=random.randint(400, 1000),
+            viewport_width=random.randint(400, 1000)
+        )
+
+    def remove_renderer(self):
+        '''Deletes renderer and releases openGL resources'''
+        if self._renderer:                                              # Delete previous renderer
+            self._renderer.delete()
+
+    def create_new_renderer(self):
+        '''Creates a new renderer with random viewport size and adds 
+        it to the class field'''
+        self._renderer = pyrender.OffscreenRenderer(                    # Define image size
+            viewport_height=random.randint(400, 1000),
+            viewport_width=random.randint(400, 1000)
+        )
+        return self._renderer
 
     def get_img(self):
         '''Returns an image'''
@@ -40,6 +54,6 @@ class Scene_Handler():
 
     def get_box(self, class_name):
         '''Returns a box label of object'''
-        return box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
+        box, ps = box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
 
-    
+        return box, ps

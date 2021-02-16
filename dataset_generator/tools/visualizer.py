@@ -16,7 +16,10 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
     imgs_path = get_full_path(img_path)                             # Full path to image directory
     imgs = os.listdir(imgs_path)                                    # List images in directory
 
-    for i in random.choices(range(len(imgs)), k=n):                 # Loop trough n random picked image indecies
+    if len(imgs) < n:                                               # Adjust n images to max number 
+        n = len(imgs)
+
+    for i in random.sample(range(len(imgs)), k=n):                  # Loop trough n random picked image indecies
 
         f, axarr = plt.subplots(                                    # Create empty figure
             row, 

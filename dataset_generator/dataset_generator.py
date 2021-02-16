@@ -1,4 +1,4 @@
-import os, humanize, time
+import os, humanize, time, pyrender, trimesh
 
 import numpy as np
 
@@ -73,11 +73,11 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
 
     s_handler = scene_handler.Scene_Handler(model)              # Create scene handler object
 
-
     for i in range(n_imgs):                                     # Loop and create images
         start_time = time.time()                                # Save start time
 
         s_handler.generate_new_random_scene()                   # Generate new random scene
+        s_handler.create_new_renderer()                         # Creates a new renderer
 
         if True:                                                # RGB images
             img = s_handler.get_img()
@@ -97,8 +97,10 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
             )
             sizes = np.append(sizes, size)
 
+        
+        points = None   # Save points for debug
         if box_label:                                           # Box labels
-            box = s_handler.get_box(
+            box, points = s_handler.get_box(
                 class_name=model_name
             )
             size = saver.save_json(
@@ -111,6 +113,14 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
         if seg_label:                                           # Seqmentation labels
             pass
 
+        s_handler.remove_renderer()                             # Deletes renderer and frees openGl resources
+
+        '''
+        box = pyrender.Mesh.from_points(points)
+        s_handler._scene.add(box)
+        pyrender.Viewer(s_handler._scene)
+        '''
+        
         times = np.append(times, time.time() - start_time)      # Save used time
 
         if show_progress and enable_print:                      # Print update

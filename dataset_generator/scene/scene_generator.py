@@ -19,15 +19,15 @@ def _add_model(scene, model, pose=np.eye(4)):
     Returns scene and models node.'''
     node = scene.add(model, pose=pose)
 
-    a_x = random.uniform(-.5, .5)                               # Random x angle
-    a_y = random.uniform(-.5, .5)                               # Random y angle
+    a_x = random.uniform(-math.pi, math.pi)                     # Random x angle
+    a_y = random.uniform(-math.pi, math.pi)                     # Random y angle
 
     scene = _add_rotation(scene, node, a_y, 'y')                # Add rotation
     scene = _add_rotation(scene, node, a_x, 'x')
 
-    t_z = random.uniform(.5, 1.5)                               # Random translation
-    t_x = random.uniform(-.4, .4)
-    t_y = random.uniform(-.4, .4)
+    t_z = random.uniform(.3, 1.0)                               # Random translation
+    t_x = random.uniform(-.2, .2)
+    t_y = random.uniform(-.2, .2)
 
     scene = _add_translation(scene, node, x=t_x, y=t_y, z=-t_z) # Add translation
     return scene, node
