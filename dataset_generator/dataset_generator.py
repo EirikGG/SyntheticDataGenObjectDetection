@@ -113,14 +113,8 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
         if seg_label:                                           # Seqmentation labels
             pass
 
-        s_handler.remove_renderer()                             # Deletes renderer and frees openGl resources
+        s_handler.remove_renderer()                             # Deletes renderer and frees openGl resources   
 
-        '''
-        box = pyrender.Mesh.from_points(points)
-        s_handler._scene.add(box)
-        pyrender.Viewer(s_handler._scene)
-        '''
-        
         times = np.append(times, time.time() - start_time)      # Save used time
 
         if show_progress and enable_print:                      # Print update

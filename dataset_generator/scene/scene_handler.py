@@ -54,6 +54,4 @@ class Scene_Handler():
 
     def get_box(self, class_name):
         '''Returns a box label of object'''
-        box, ps = box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
-
-        return box, ps
+        return box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
