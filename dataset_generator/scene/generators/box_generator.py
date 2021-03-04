@@ -27,8 +27,7 @@ def get_box(scene, renderer, model_node, class_name):
     l, r, t, b = math.inf, -math.inf, math.inf, -math.inf
     for prim in model_node.mesh.primitives:                     # Iterate primitives in object
         for point in prim.positions:                            # Iterate points in primitives
-            #point = point + obj_p
-            point = np.append(point.flatten(), 1)               # Row vector with omega value
+            point = np.append(point.flatten(), 1)               # Row vector with added omega value
             point = np.dot(point, obj_pose.T)                   # Add object rotation/translation to point
 
             p_2d = np.dot(point, projection_mat)                # Use camera projection matrix to convert to image coordinates

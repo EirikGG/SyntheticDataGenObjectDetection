@@ -9,7 +9,7 @@ from PIL import Image
 def get_full_path(p):
     return os.path.join(os.getcwd(), p)
 
-def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
+def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
     '''Displays n random images'''
     row, col = 2, 2 
     
@@ -61,10 +61,21 @@ def show_images(img_path, depth_path=None, box_path=None, seg_path=None, n=3):
                 vmax=255
             )                                                       # Add title to subplot
             axarr[0, 1].title.set_text('Depth image: {}'.format(depth_img))
+
+        if mask_path:                                               # Print mask image
+            mp = get_full_path(mask_path)                           # Depth image folder
+            mask_img = os.listdir(mp)[i]                            # Pick image
+            axarr[1, 1].imshow(                                     # Add to subplot
+                plt.imread(os.path.join(mp, mask_img)),
+                cmap='gray',
+                vmin=0,
+                vmax=255
+            )                                                       # Add title to subplot
+            axarr[1, 1].title.set_text('Mask image: {}'.format(mask_img))
             
     plt.show()                                                      # Show figure
     
 
 
 if '__main__'==__name__:
-    show_images(img_path='out\\images', depth_path='out\\depth', box_path='out\\box', seg_path=None, n=3)
+    show_images(img_path='out\\images', depth_path='out\\depth', box_path='out\\box', mask_path=None, n=3)

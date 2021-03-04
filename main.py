@@ -1,14 +1,14 @@
 from dataset_generator import dataset_generator
 
 dataset_generator.generate_dataset(
-    n_imgs=5,
+    n_imgs=2,
     model_name='door_handle',
     model_path='assets\\test.obj',
     output_path='out',
     
     depth_img=True,
     box_label=True,
-    seg_label=False,
+    mask_label=True,
 
     show_progress=True,
     enable_print=True,

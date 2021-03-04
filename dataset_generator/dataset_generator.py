@@ -6,10 +6,10 @@ from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
 def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', 
-                        depth_img=True, box_label=True, seg_label=True, show_progress=True, 
+                        depth_img=True, box_label=True, mask_label=True, show_progress=True, 
                         enable_print=True, img_visualizer=False, n_preview_images=2,
                         image_dir = 'images', depth_dir = 'depth', box_dir = 'box',
-                        seg_dir = 'seg'):
+                        mask_dir = 'mask'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
     model_path:         path to main model
@@ -17,7 +17,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
     rgb:                Create rgb images
     depth_image:        Create depth images
     box_label:          Create box labels
-    seg_label:          Create seqmentation labels
+    mask_label:         Create seqmentation labels
     show_progress:      Print progress while generating
     enable_print:       Enable disable all prints, overwrites "show progress"
     img_visualizer:     Enable image preview 
@@ -25,7 +25,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
     image_dir:          Name of output subfolder for images
     depth_dir:          Name of output subfolder for depth images
     box_dir:            Name of output subfolder for box labels
-    seg_dir:            Name of output subfolder for segementation labels'''
+    mask_dir:           Name of output subfolder for mask labels'''
 
 
     if 0 >= n_imgs or not type(n_imgs) == int:                  # Number of images should be int and positive
@@ -49,8 +49,8 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
         raise Exception('Missing "{}" output folder'.format(box_dir))
     
                                                                 # Ensure depth image folder exists
-    if seg_label and not os.path.isdir(os.path.join(output_path, seg_dir)):
-        raise Exception('Missing "{}" output folder'.format(seg_dir))
+    if mask_label and not os.path.isdir(os.path.join(output_path, mask_dir)):
+        raise Exception('Missing "{}" output folder'.format(mask_dir))
 
     if enable_print:                                            # Print configuration
         print('\n'.join((
@@ -60,7 +60,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
             'Model path:                    {}'.format(model_path),
             'Output path:                   {}'.format(output_path),
             'Create depth images:           {}'.format(depth_img),
-            'Create segmentation lables:    {}'.format(seg_label),
+            'Create mask lables:            {}'.format(mask_label),
             'Create box labels:             {}'.format(box_label),
             'Show progress:                 {}'.format(show_progress),
             '\n'
@@ -100,7 +100,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
         
         points = None   # Save points for debug
         if box_label:                                           # Box labels
-            box, points = s_handler.get_box(
+            box = s_handler.get_box(
                 class_name=model_name
             )
             size = saver.save_json(
@@ -110,8 +110,14 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
             )
             sizes = np.append(sizes, size)
 
-        if seg_label:                                           # Seqmentation labels
-            pass
+        if mask_label:                                           # Seqmentation labels
+            mask = s_handler.get_mask()
+            size = saver.save_pil_img(
+                pil_img=mask,
+                folder=os.path.join(output_path, mask_dir),
+                name='mask{}.jpg'.format(i)
+            )
+            sizes = np.append(sizes, size)
 
         s_handler.remove_renderer()                             # Deletes renderer and frees openGl resources   
 
@@ -167,7 +173,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
             depth_path=os.path.join(output_path, depth_dir) if depth_img else None,
 
             box_path=os.path.join(output_path, box_dir) if box_label else None,
-            seg_path=os.path.join(output_path, seg_dir) if seg_label else None,
+            mask_path=os.path.join(output_path, mask_dir) if mask_label else None,
 
             n = n_preview_images
         )

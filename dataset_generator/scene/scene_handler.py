@@ -1,7 +1,7 @@
 import pyrender, trimesh, random
 
 from dataset_generator.scene import scene_generator
-from dataset_generator.scene.generators import image_generator, depth_generator, box_generator, seg_generator
+from dataset_generator.scene.generators import image_generator, depth_generator, box_generator, mask_generator
 
 class Scene_Handler():
     _model = None
@@ -55,3 +55,7 @@ class Scene_Handler():
     def get_box(self, class_name):
         '''Returns a box label of object'''
         return box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
+
+    def get_mask(self):
+        '''Returns a mask of the object'''
+        return mask_generator.get_mask(self._scene, self._renderer, self._model_node)
