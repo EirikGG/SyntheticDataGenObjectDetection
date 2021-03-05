@@ -143,7 +143,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
         working_dir = os.path.abspath(os.getcwd())
         print('\n'.join((
             '\n',
-            'Finished in:                   {}s'.format(round(sum(times))),
+            'Finished in:                   {}s'.format(round(sum(times), 1)),
             'Dataset size:                  {}'.format(humanize.naturalsize(sum(sizes))),
             'Saved to folder:               {}'.format(os.path.join(working_dir, output_path)),
             '',
