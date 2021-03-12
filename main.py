@@ -1,9 +1,12 @@
+import os
+
 from dataset_generator import dataset_generator
 
+
 dataset_generator.generate_dataset(
-    n_imgs=10,
+    n_imgs=5,
     model_name='door_handle',
-    model_path='assets\\test.obj',
+    model_path=os.path.join(os.getcwd(), 'assets', 'test.obj'),
     output_path='out',
     
     depth_img=True,
