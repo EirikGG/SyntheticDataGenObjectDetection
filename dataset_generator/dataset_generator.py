@@ -32,7 +32,7 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
         raise Exception('Number of images should be greater than zero and an integer, not {}'.format(n_imgs))
 
     if not os.path.isfile(model_path):                          # Ensures that model path points to file
-        raise Exception('Model path dont point to a file: {}'.format(path))
+        raise Exception('Model path dont point to a file: {}'.format(model_path))
 
     if not os.path.isdir(output_path):                          # Ensures that output folder path is folder
         raise Exception('Output path is not a directory: {}'.format(output_path))
