@@ -5,23 +5,23 @@ import numpy as np
 from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
-def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model', 
-                        depth_img=True, box_label=True, mask_label=True, show_progress=True, 
-                        enable_print=True, img_visualizer=False, n_preview_images=2,
-                        image_dir = 'images', depth_dir = 'depth', box_dir = 'box',
-                        mask_dir = 'mask'):
+def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str='3d_model', 
+                        depth_img:bool=True, box_label:bool=True, mask_label:bool=True,
+                        show_progress:bool=True, enable_print:bool=True, img_visualizer:bool=False, 
+                        n_preview_images:int=2, image_dir:str = 'images', depth_dir:str = 'depth', 
+                        box_dir:str = 'box', mask_dir:str = 'mask'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
     model_path:         path to main model
     output_path:        Results are written in subfolders of output_path
-    rgb:                Create rgb images
+    model_name:         Name to use in label, default value is 3d_model
     depth_image:        Create depth images
     box_label:          Create box labels
     mask_label:         Create seqmentation labels
     show_progress:      Print progress while generating
     enable_print:       Enable disable all prints, overwrites "show progress"
     img_visualizer:     Enable image preview 
-    n_preview_images:   Number of images to previou
+    n_preview_images:   Number of images to preview
     image_dir:          Name of output subfolder for images
     depth_dir:          Name of output subfolder for depth images
     box_dir:            Name of output subfolder for box labels
@@ -136,7 +136,7 @@ def generate_dataset(n_imgs, model_path, output_path, model_name='3d_model',
                 'Average time: {}s'.format(avg_time),
                 'Remaining time: {}s'.format(round(avg_time * (n_imgs - i - 1), 3)),
                 'Folder size: {}'.format(humanize.naturalsize(sum(sizes))),
-            )), end='{}{}'.format(''.join([' 'for _ in range(10)]), '\r'))
+            )), end='     \r', flush=True)
 
 
     if enable_print:                                            # Print ending statement

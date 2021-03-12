@@ -12,5 +12,6 @@ def load_model(model_path):
 
 def load_obj(path):
     '''Loads a object file'''
-    obj_trimesh = trimesh.load(path)
+    obj_trimesh = trimesh.load(path)                        # Load mesh from path
+    
     return pyrender.Mesh.from_trimesh(obj_trimesh)

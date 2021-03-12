@@ -3,7 +3,7 @@ from dataset_generator import dataset_generator
 dataset_generator.generate_dataset(
     n_imgs=10,
     model_name='door_handle',
-    model_path='assets\\dof.obj',
+    model_path='assets\\test.obj',
     output_path='out',
     
     depth_img=True,
