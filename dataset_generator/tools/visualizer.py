@@ -14,7 +14,7 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
     row, col = 2, 2 
     
     imgs_path = get_full_path(img_path)                             # Full path to image directory
-    imgs = os.listdir(imgs_path)                                    # List images in directory
+    imgs = sorted(os.listdir(imgs_path))                            # List images in directory
 
     if len(imgs) < n:                                               # Adjust n images to max number 
         n = len(imgs)
@@ -36,7 +36,8 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
             axarr[1, 0].imshow(plt.imread(os.path.join(img_path, img)))
 
             bp = get_full_path(box_path)                            # Path to box dir
-            box = os.listdir(bp)[i]                                 # Pick same box as image
+            
+            box = sorted(os.listdir(bp))[i]                         # Pick same box as image
             with open(os.path.join(bp, box)) as f:                  # Read file
                 data = json.load(f).split()                         # Load text
             
@@ -53,7 +54,7 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
 
         if depth_path:                                              # Print deph image
             dp = get_full_path(depth_path)                          # Depth image folder
-            depth_img = os.listdir(dp)[i]                           # Pick image
+            depth_img = sorted(os.listdir(dp))[i]                   # Pick image
             axarr[0, 1].imshow(                                     # Add to subplot
                 plt.imread(os.path.join(dp, depth_img)),
                 cmap='gray',
@@ -64,7 +65,7 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
 
         if mask_path:                                               # Print mask image
             mp = get_full_path(mask_path)                           # Depth image folder
-            mask_img = os.listdir(mp)[i]                            # Pick image
+            mask_img = sorted(os.listdir(mp))[i]                    # Pick image
             axarr[1, 1].imshow(                                     # Add to subplot
                 plt.imread(os.path.join(mp, mask_img)),
                 cmap='gray',

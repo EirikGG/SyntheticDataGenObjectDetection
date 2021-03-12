@@ -4,7 +4,7 @@ from dataset_generator import dataset_generator
 
 
 dataset_generator.generate_dataset(
-    n_imgs=5,
+    n_imgs=11,
     model_name='door_handle',
     model_path=os.path.join(os.getcwd(), 'assets', 'test.obj'),
     output_path='out',
