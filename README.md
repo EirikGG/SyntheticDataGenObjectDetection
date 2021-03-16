@@ -14,14 +14,14 @@ GP-GAN is a system created by Hui-Kai Wu, github user wuhuikai, to blend parts o
 
 ### Download and install docker
 1. ```apt install docker.io```
-2. ```docker pull nivida/cuda 10.1-devel-ubuntu18.04```
+2. ```docker pull cupy/cupy:v6.3.0```
 
 ### Setup NVIDIA container toolkit
 To setup container toolkit, go to the [this](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker) link and follow the instruction from "Setting up NVIDIA containter toolkit". The last command is using the wrong version, so to test the install with the following command: 
-* ```docker run --rm --gpus all nvidia/cuda:10.1-devel-ubuntu18.04 nvidia-smi```
+* ```docker run --rm --gpus all cupy/cupy:v6.3.0 nvidia-smi```
 
 To start container, run:
-* ```docker run --it --gpus all -v "PATH TO OUTPUT IMAGES FOLDER":"/imgs", "PATH TO GP_GAN FOLDER":"/gp-gan" nvidia/cuda:10.1-devel-ubuntu18.04```
+* ```docker run --it --gpus all -v "PATH TO OUTPUT IMAGES FOLDER":"/imgs", "PATH TO GP_GAN FOLDER":"/gp-gan" cupy/cupy:v6.3.0```
 
 PATH TO OUTPUT IMAGES FOLDER is the folder where generated images are saved and PATH TO GP_GAN FOLDER is the path to the download loaction of the GP-GAN repository.
 
@@ -43,3 +43,6 @@ The following steps are a modefied version of the steps found [here](https://tec
 ### Install GP-GAN requirements
 1. ```cd ~/../gp-gan```
 2. ```pip3.5 install -r requirements/test/requirements.txt```
+
+### Fix cupy install
+1. ```pip3.5 uninstall cupy==6.3.0```
