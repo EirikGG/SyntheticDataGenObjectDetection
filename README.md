@@ -6,6 +6,8 @@ Generate realistic dataset of depth images from CAD models
 ### Download GP-GAN repository
 1. ```cd TO_A_DOWNLOAD_LOCATION```
 2. ```git pull https://github.com/wuhuikai/GP-GAN.git```
+3. Download pre-trained models from [Google drive](https://drive.google.com/drive/folders/0Bybnpq8dvwudVjBHNWNHUmVSV28).
+4. Extract models to GP-GAN models folder
 
 ### Download and install docker
 1. ```apt install docker.io```
