@@ -3,6 +3,9 @@ Generate realistic dataset of depth images from CAD models
 
 ## Install GP-GAN using a docker container
 
+GP-GAN is a system created by Hui-Kai Wu, github user wuhuikai, to blend parts of one image together with another based on a mask. It is used in this project to add background to the generated images. The following tutorial is the replication of the steps I took to install the system and to use it to complete the dataset generation.
+
+
 ### Download GP-GAN repository
 1. ```cd TO_A_DOWNLOAD_LOCATION```
 2. ```git pull https://github.com/wuhuikai/GP-GAN.git```
