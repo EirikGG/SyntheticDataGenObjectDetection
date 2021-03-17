@@ -8,7 +8,7 @@ from dataset_generator.tools import loader, saver, visualizer
 def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str='3d_model', 
                         depth_img:bool=True, box_label:bool=True, mask_label:bool=True,
                         show_progress:bool=True, enable_print:bool=True, img_visualizer:bool=False, 
-                        n_preview_images:int=2, image_dir:str = 'images', depth_dir:str = 'depth', 
+                        n_preview_images:int=2, image_dir:str = 'imgs', depth_dir:str = 'depth', 
                         box_dir:str = 'box', mask_dir:str = 'mask'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create

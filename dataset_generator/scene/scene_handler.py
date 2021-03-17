@@ -25,10 +25,12 @@ class Scene_Handler():
         height and width'''
         if self._renderer:                                              # Delete previous renderer
             self._renderer.delete()
+        
         self._renderer = pyrender.OffscreenRenderer(                    # Define image size
             viewport_height=random.randint(400, 1000),
             viewport_width=random.randint(400, 1000)
         )
+        
 
     def remove_renderer(self):
         '''Deletes renderer and releases openGL resources'''
@@ -37,10 +39,14 @@ class Scene_Handler():
 
     def create_new_renderer(self):
         '''Creates a new renderer with random viewport size and adds 
-        it to the class field'''
+        it to the class field''''''
         self._renderer = pyrender.OffscreenRenderer(                    # Define image size
             viewport_height=random.randint(400, 1000),
             viewport_width=random.randint(400, 1000)
+        )'''
+        self._renderer = pyrender.OffscreenRenderer(
+            viewport_height=512,
+            viewport_width=512
         )
         return self._renderer
 
