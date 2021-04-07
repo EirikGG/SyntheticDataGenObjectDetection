@@ -17,7 +17,7 @@ for model in models:
         box_label=True,
         mask_label=True,
         
-        bg_method='color:255,255,255',
+        bg_method='color:0,0,0',
         
         show_progress=True,
         enable_print=True,
