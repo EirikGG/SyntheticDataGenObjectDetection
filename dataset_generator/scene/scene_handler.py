@@ -39,20 +39,21 @@ class Scene_Handler():
 
     def create_new_renderer(self):
         '''Creates a new renderer with random viewport size and adds 
-        it to the class field''''''
+        it to the class field'''
         self._renderer = pyrender.OffscreenRenderer(                    # Define image size
             viewport_height=random.randint(400, 1000),
             viewport_width=random.randint(400, 1000)
-        )'''
-        self._renderer = pyrender.OffscreenRenderer(
-            viewport_height=512,
-            viewport_width=512
         )
+        '''
+        self._renderer = pyrender.OffscreenRenderer(
+            viewport_height=1050,
+            viewport_width=1680
+        )'''
         return self._renderer
 
-    def get_img(self):
+    def get_img(self, bg_method):
         '''Returns an image'''
-        return image_generator.get_img(self._scene, self._renderer)
+        return image_generator.get_img(self._scene, self._renderer, bg_method)
 
     def get_depth(self):
         '''Returns an image'''

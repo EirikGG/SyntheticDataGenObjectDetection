@@ -7,9 +7,9 @@ from dataset_generator.tools import loader, saver, visualizer
 
 def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str='3d_model', 
                         depth_img:bool=True, box_label:bool=True, mask_label:bool=True,
-                        show_progress:bool=True, enable_print:bool=True, img_visualizer:bool=False, 
-                        n_preview_images:int=2, image_dir:str = 'imgs', depth_dir:str = 'depth', 
-                        box_dir:str = 'box', mask_dir:str = 'mask'):
+                        bg_method:str='none', show_progress:bool=True, enable_print:bool=True,
+                        img_visualizer:bool=False, n_preview_images:int=2, image_dir:str = 'imgs', 
+                        depth_dir:str = 'depth', box_dir:str = 'box', mask_dir:str = 'mask'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
     model_path:         path to main model
@@ -18,6 +18,8 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
     depth_image:        Create depth images
     box_label:          Create box labels
     mask_label:         Create seqmentation labels
+    bg_method:          Which method to use when adding bacground
+                        ('none', 'copy_paste', 'black', 'white', 'alpha_blend', 'random')
     show_progress:      Print progress while generating
     enable_print:       Enable disable all prints, overwrites "show progress"
     img_visualizer:     Enable image preview 
@@ -80,7 +82,7 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
         s_handler.create_new_renderer()                         # Creates a new renderer
 
         if True:                                                # RGB images
-            img = s_handler.get_img()
+            img = s_handler.get_img(bg_method)
             size = saver.save_pil_img(
                 pil_img=img,
                 folder=os.path.join(output_path, image_dir),

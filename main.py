@@ -13,6 +13,8 @@ dataset_generator.generate_dataset(
     box_label=True,
     mask_label=True,
 
+    bg_method='copy_paste',
+
     show_progress=True,
     enable_print=True,
 

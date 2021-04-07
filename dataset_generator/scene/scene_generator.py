@@ -4,7 +4,6 @@ import numpy as np
 
 def generate_random_scene(model):
     scene = pyrender.Scene()                                    # Create new scene
-    scene.bg_color = (0, 0, 0, 0)
 
     scene, model_node = _add_model(scene, model)                # Add model to scene
 
