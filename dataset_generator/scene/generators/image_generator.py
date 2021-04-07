@@ -6,7 +6,9 @@ from PIL import Image
 
 def _create_img(scene, renderer, bg_color):
     scene.bg_color = bg_color
-    color, _ = renderer.render(scene)                                       # Get image
+    color, _ = renderer.render(                                             # Get image
+        scene,
+    )                                       
     return Image.fromarray(color.astype('uint8'), 'RGB')                    # Convert from point cloud to pil image
 
 def _get_rand_img(folder):
@@ -27,7 +29,7 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
 
             img = _create_img(scene, renderer, col_arr)
         except:
-            raise('Color not formated correctly (color: r,g,b), ex: "color:255,255,255"')
+            raise Exception('Color not formated correctly (color: r,g,b), ex: "color:255,255,255"')
 
     
     elif 'random'==bg_method:

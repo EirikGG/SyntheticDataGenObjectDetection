@@ -25,30 +25,29 @@ def get_box(scene, renderer, model_node, class_name):
     )
     
     l, r, t, b = math.inf, -math.inf, math.inf, -math.inf
+    prims = 0
+    pots = 0
     for prim in model_node.mesh.primitives:                     # Iterate primitives in object
         for point in prim.positions:                            # Iterate points in primitives
             point = np.append(point.flatten(), 1)               # Row vector with added omega value
             point = np.dot(point, obj_pose.T)                   # Add object rotation/translation to point
-
             p_2d = np.dot(point, projection_mat)                # Use camera projection matrix to convert to image coordinates
 
-            if 0 < p_2d[-1] and p_2d[-1] < 1:                   # Check w is between zero and one
-                p_2d = p_2d / p_2d[-1]                          # Divide the array by w
-                
-                x = round(((p_2d[0] + 1.0)/2.0)*width)          # X pixel coodinate
-                if l > x:
-                    l = x
-                if r < x:
-                    r = x
+            #if 0 < p_2d[-1] and p_2d[-1] < 2:                   # Check w is between zero and one
+            p_2d = p_2d / p_2d[-1]                          # Divide the array by w
+            
+            x = round(((p_2d[0] + 1.0)/2.0)*width)          # X pixel coodinate
+            if l > x:
+                l = x
+            if r < x:
+                r = x
 
-                                                                # Y pixel coordinate
-                y = round(height - ((p_2d[1] + 1.0)/2.0)*height)
-                if t > y:
-                    t = y
-                if b < y:
-                    b = y
-
-    
+                                                            # Y pixel coordinate
+            y = round(height - ((p_2d[1] + 1.0)/2.0)*height)
+            if t > y:
+                t = y
+            if b < y:
+                b = y
 
     kitti_str = ' '.join((
         class_name,                                             # Object name

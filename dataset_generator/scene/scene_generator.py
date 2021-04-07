@@ -3,14 +3,25 @@ import pyrender, trimesh, random, math
 import numpy as np
 
 def generate_random_scene(model):
-    scene = pyrender.Scene()                                    # Create new scene
+    scene = pyrender.Scene(                                     # Create new scene
+        ambient_light=[int(random.uniform(0, 1)*255) for _ in range(3)]
+    )
 
     scene, model_node = _add_model(scene, model)                # Add model to scene
 
-    for l_type in ['directional_lights', 'point_lights']:       # Adds light to the scene
+    scene, cam = _add_camera(scene)                             # Add camera
+
+    '''
+    for l_type in ('directional_lights', 'point_lights'):       # Adds light to the scene
         scene = _add_lighting(scene, light_type=l_type)
 
-    scene, cam = _add_camera(scene)                             # Add camera
+    scene.add(
+        pyrender.DirectionalLight(
+            color=np.ones(3),
+            intensity=10.0,
+        ), pose = scene.get_pose(scene.main_camera_node)
+    )
+    '''
 
     return scene, model_node, cam
 
@@ -25,7 +36,7 @@ def _add_model(scene, model, pose=np.eye(4)):
     scene = _add_rotation(scene, node, a_y, 'y')                # Add rotation
     scene = _add_rotation(scene, node, a_x, 'x')
 
-    t_z = random.uniform(.3, 1.0)                               # Random translation
+    t_z = random.uniform(10, 15)                                # Random translation
     t_x = random.uniform(-.2, .2)
     t_y = random.uniform(-.2, .2)
 
@@ -43,13 +54,13 @@ def _add_lighting(scene, light_type, random_range=(1, 4)):
     for _ in range(n):                                          # Add directional lights
         d = None
         if 'directional_lights'==light_type:
-            d = pyrender.DirectionalLight(color=[1.0,1.0,1.0], intensity=2.0)
+            d = pyrender.DirectionalLight(color=[1.0,1.0,1.0], intensity=5)
         elif 'point_lights'==light_type:
-            d = pyrender.PointLight(color=[1.0,1.0,1.0], intensity=2.0)
+            d = pyrender.PointLight(color=[1.0,1.0,1.0], intensity=5)
         else:
             raise Exception('Light type not recognized, should be \"direction_lights\" or \"point_lights\", not {}'.format(light_type))
 
-        scene.add(d)
+        _add_model(scene, d)
 
     return scene
 
@@ -59,7 +70,7 @@ def _add_camera(scene):
     cam = pyrender.PerspectiveCamera(                           # Create perspective camera
         yfov=np.pi/3.0,
         znear = 0.05,
-        zfar=10
+        zfar=100
     )
 
     cam = scene.add(cam)                                        # Add camera to scene
