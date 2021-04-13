@@ -9,7 +9,21 @@ from PIL import Image
 def get_full_path(p):
     return os.path.join(os.getcwd(), p)
 
-def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
+def get_coord(bbox, bbox_format, img_dim):
+    '''Takes bbox information and returns coordinates, (left, top, width, height)'''
+    if 'kitti' == bbox_format:
+        return int(bbox[4]),  int(bbox[5]), int(bbox[6]) - int(bbox[4]), int(bbox[7]) - int(bbox[5])
+
+    image_w, image_h = img_dim[1], img_dim[0]
+    if 'yolo' == bbox_format:
+        x = int(float(bbox[1])*image_w)
+        y = int(float(bbox[2])*image_h)
+        w = int(float(bbox[3])*image_w)
+        h = int(float(bbox[4])*image_h)
+        
+        return x-w/2, y-h/2, w, h
+
+def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3, bbox_format='kitti'):
     '''Displays n random images'''
     row, col = 2, 2 
     
@@ -29,7 +43,9 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
         
         img = imgs[i]                                               # Picked image
 
-        axarr[0, 0].imshow(plt.imread(os.path.join(img_path, img))) # Add image to first subplot
+        img_arr = plt.imread(os.path.join(img_path, img))
+
+        axarr[0, 0].imshow(img_arr)                                 # Add image to first subplot
         axarr[0, 0].title.set_text('Image: {}'.format(img))         # Add title to subplot
 
         if box_path:
@@ -39,12 +55,14 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3):
             
             box = sorted(os.listdir(bp))[i]                         # Pick same box as image
             with open(os.path.join(bp, box)) as f:                  # Read file
-                data = json.load(f).split()                         # Load text
+                bbox = f.read().split()                             # Load text
             
+            x, y, w, h = get_coord(bbox, bbox_format, img_arr.shape)
+
             rect = patches.Rectangle(                               # Create new rectangle
-                (int(data[4]), int(data[5])),
-                int(data[6]) - int(data[4]),                        # Width
-                int(data[7]) - int(data[5]),                        # Height
+                (x, y),
+                w,                                                  # Width
+                h,                                                  # Height
                 linewidth=1,
                 edgecolor='r',
                 facecolor='none'

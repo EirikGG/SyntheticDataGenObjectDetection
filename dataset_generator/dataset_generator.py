@@ -6,7 +6,7 @@ from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
 def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str='3d_model', 
-                        depth_img:bool=True, box_label:bool=True, mask_label:bool=True,
+                        depth_img:bool=True, box_label:bool=True, box_format='yolo', mask_label:bool=True,
                         bg_method:str='none', show_progress:bool=True, enable_print:bool=True,
                         img_visualizer:bool=False, n_preview_images:int=2, image_dir:str = 'imgs', 
                         depth_dir:str = 'depth', box_dir:str = 'box', mask_dir:str = 'mask'):
@@ -71,7 +71,9 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
     sizes = np.array([])                                        # Save filesizes
     times = np.array([])                                        # Save creation time
 
-    model = loader.load_model(model_path)                       # Load model to use
+    model = loader.load_model(                                  # Load model to use
+        model_path=model_path
+    )                       
 
     s_handler = scene_handler.Scene_Handler(model)              # Create scene handler object
 
@@ -103,12 +105,13 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
         points = None   # Save points for debug
         if box_label:                                           # Box labels
             box = s_handler.get_box(
-                class_name=model_name
+                class_name=model_name,
+                bbox_format=box_format
             )
-            size = saver.save_json(
+            size = saver.save_txt(
                 dic=box,
                 folder=os.path.join(output_path, box_dir),
-                name='box{}.txt'.format(i)
+                name='image{}.txt'.format(i)
             )
             sizes = np.append(sizes, size)
 
@@ -177,5 +180,7 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
             box_path=os.path.join(output_path, box_dir) if box_label else None,
             mask_path=os.path.join(output_path, mask_dir) if mask_label else None,
 
-            n = n_preview_images
+            n = n_preview_images,
+
+            bbox_format=box_format
         )

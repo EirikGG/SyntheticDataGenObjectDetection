@@ -22,6 +22,14 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
     '''Takes a rendered image from the scene'''
     img = None
 
+    if 'random_mix' == bg_method: 
+        bg_method = random.choice((
+            f'color:{random.randrange(255)},{random.randrange(255)},{random.randrange(255)}',
+            'random',
+            'alpha_blend',
+            'copy_paste'
+        ))
+
     if 'color' in bg_method:
         try:
             col_str = bg_method.split(':')[1]

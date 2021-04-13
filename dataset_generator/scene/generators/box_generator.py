@@ -2,7 +2,7 @@ import pyrender, math, trimesh
 
 import numpy as np
 
-def get_box(scene, renderer, model_node, class_name):
+def get_box(scene, renderer, model_node, class_name, bbox_format):
     '''Creates box label of model from scene and returns label str in kitti format
     https://github.com/bostondiditeam/kitti/blob/master/resources/devkit_object/readme.txt'''
 
@@ -49,23 +49,39 @@ def get_box(scene, renderer, model_node, class_name):
             if b < y:
                 b = y
 
-    kitti_str = ' '.join((
-        class_name,                                             # Object name
-        str(0),                                                 # Truncated float from 0 to 1
-        str(3),                                                 # Occlusion int 0 to 3
-        str(math.pi),                                           # Observation angle -pi to pi
-        str(l),                                                 # BBOX: Left
-        str(t),                                                 # BBOX: Top
-        str(r),                                                 # BBOX: Right
-        str(b),                                                 # BBOX: Bottom
-        str(1),                                                 # DIM: Height
-        str(1),                                                 # DIM: Width
-        str(1),                                                 # DIM: Length
-        str(1),                                                 # Location: x
-        str(1),                                                 # Location: y
-        str(1),                                                 # Location: z
-        str(1),                                                 # Rotation: y
-        str(-1),                                                # Score (used for submission)
-    ))
+    res = ''
 
-    return kitti_str
+    if 'kitti' == bbox_format:
+        res = ' '.join((
+            class_name,                                             # Object name
+            str(0),                                                 # Truncated float from 0 to 1
+            str(3),                                                 # Occlusion int 0 to 3
+            str(math.pi),                                           # Observation angle -pi to pi
+            str(l),                                                 # BBOX: Left
+            str(t),                                                 # BBOX: Top
+            str(r),                                                 # BBOX: Right
+            str(b),                                                 # BBOX: Bottom
+            str(1),                                                 # DIM: Height
+            str(1),                                                 # DIM: Width
+            str(1),                                                 # DIM: Length
+            str(1),                                                 # Location: x
+            str(1),                                                 # Location: y
+            str(1),                                                 # Location: z
+            str(1),                                                 # Rotation: y
+            str(-1),                                                # Score (used for submission)
+        ))
+    elif 'yolo' == bbox_format:
+        vs = (                                                      # Coordinates in yolo format: class x_center y_center width height
+            (l + (r-l)/2) / width,
+            (t + (b-t)/2) / height,
+            (r-l) / width,
+            (b-t) / height,
+        )
+
+        vs = [max(min(v, 1), 0) for v in vs]                        # Map values from 0 - 1
+        vs = map(str, vs)                                           # Cast values to string
+        res = ' '.join(('0', *vs))                                  # Assemble final string
+        
+    else: raise Exception(f'Invalid bbox format {bbox_format}')
+
+    return res

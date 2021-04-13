@@ -59,9 +59,9 @@ class Scene_Handler():
         '''Returns an image'''
         return depth_generator.get_depth(self._scene, self._renderer)
 
-    def get_box(self, class_name):
+    def get_box(self, class_name, bbox_format):
         '''Returns a box label of object'''
-        return box_generator.get_box(self._scene, self._renderer, self._model_node, class_name)
+        return box_generator.get_box(self._scene, self._renderer, self._model_node, class_name, bbox_format)
 
     def get_mask(self):
         '''Returns a mask of the object'''
