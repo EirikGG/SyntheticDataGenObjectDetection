@@ -36,11 +36,20 @@ def _add_model(scene, model, pose=np.eye(4)):
     scene = _add_rotation(scene, node, a_y, 'y')                # Add rotation
     scene = _add_rotation(scene, node, a_x, 'x')
 
-    t_z = random.uniform(.2, .7)                                # Random translation
-    t_x = random.uniform(-.2, .2)
-    t_y = random.uniform(-.2, .2)
+    t_z = random.uniform(5, 12)                                # Random translation
+    t_x = random.uniform(-4, 4)
+    t_y = random.uniform(-4, 4)
 
-    scene = _add_translation(scene, node, x=t_x, y=t_y, z=-t_z) # Add translation
+    try: t_x, t_y, t_z = [v1*v2 for v1, v2 in zip((t_x, t_y, t_z), node.mesh.extents)]
+    except Exception as e: pass
+
+    scene = _add_translation(                                   # Add translation
+        scene,
+        node,
+        x=t_x,
+        y=t_y,
+        z=-t_z
+    )
     return scene, node
 
 def _add_lighting(scene, light_type, random_range=(1, 4)):

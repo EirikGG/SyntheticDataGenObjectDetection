@@ -3,12 +3,13 @@ import os
 from dataset_generator import dataset_generator
 
 models = ('test_object_rect_100_50_20', )
+models = ('musicAngle3', )
 
 for model in models:
     model_path = os.path.join(os.getcwd(), 'assets', f'{model}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=200,
+        n_imgs=1000,
         model_name=model,
         model_path=model_path,
         output_path=f'out_{model}',
