@@ -36,12 +36,13 @@ def _add_model(scene, model, pose=np.eye(4)):
     scene = _add_rotation(scene, node, a_y, 'y')                # Add rotation
     scene = _add_rotation(scene, node, a_x, 'x')
 
-    t_z = random.uniform(5, 12)                                # Random translation
+    t_z = random.uniform(5, 12)                                 # Random translation
     t_x = random.uniform(-4, 4)
     t_y = random.uniform(-4, 4)
 
+    # Multiply variables with model size to scale it
     try: t_x, t_y, t_z = [v1*v2 for v1, v2 in zip((t_x, t_y, t_z), node.mesh.extents)]
-    except Exception as e: pass
+    except Exception as e: pass # Model is light and dont have mesh.extent
 
     scene = _add_translation(                                   # Add translation
         scene,

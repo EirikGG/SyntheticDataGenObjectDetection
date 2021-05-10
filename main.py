@@ -9,7 +9,7 @@ for model in models:
     model_path = os.path.join(os.getcwd(), 'assets', f'{model}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=1000,
+        n_imgs=100,
         model_name=model,
         model_path=model_path,
         output_path=f'out_{model}',
@@ -21,7 +21,7 @@ for model in models:
         box_dir='labels',
         mask_label=False,
         
-        bg_method='random_mix',
+        bg_method='copy_paste',
         
         show_progress=True,
         enable_print=True,

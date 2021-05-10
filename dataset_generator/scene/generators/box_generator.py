@@ -80,7 +80,7 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
 
         vs = [max(min(v, 1), 0) for v in vs]                        # Map values from 0 - 1
         vs = map(str, vs)                                           # Cast values to string
-        res = ' '.join(('0', *vs))                                  # Assemble final string
+        res = ' '.join((class_name, *vs))                           # Assemble final string with id
         
     else: raise Exception(f'Invalid bbox format {bbox_format}')
 

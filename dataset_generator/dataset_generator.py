@@ -5,11 +5,27 @@ import numpy as np
 from dataset_generator.scene import scene_handler
 from dataset_generator.tools import loader, saver, visualizer
 
-def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str='3d_model', 
-                        depth_img:bool=True, box_label:bool=True, box_format='yolo', mask_label:bool=True,
-                        bg_method:str='none', show_progress:bool=True, enable_print:bool=True,
-                        img_visualizer:bool=False, n_preview_images:int=2, image_dir:str = 'imgs', 
-                        depth_dir:str = 'depth', box_dir:str = 'box', mask_dir:str = 'mask'):
+def generate_dataset(
+    n_imgs:int,
+    model_path:str,
+    output_path:str,
+    model_name:str='3d_model',
+    depth_img:bool=True,
+    box_label:bool=True,
+    box_format='yolo',
+    mask_label:bool=True,
+    bg_method:str='none',
+    show_progress:bool=True,
+    enable_print:bool=True,
+    img_visualizer:bool=False,
+    n_preview_images:int=2,
+    image_dir:str = 'images',
+    depth_dir:str = 'depth',
+    box_dir:str = 'labels',
+    mask_dir:str = 'mask',
+    val_persentage:float=.2,
+    train_dir_name:str='train',
+    val_dir_name:str='val'):
     '''Loops trough number of images, generates a new image and saves the results.
     n_imgs:             number of images to create
     model_path:         path to main model
@@ -17,8 +33,9 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
     model_name:         Name to use in label, default value is 3d_model
     depth_image:        Create depth images
     box_label:          Create box labels
+    box_format:         Format for labels (yolo, kitti)
     mask_label:         Create seqmentation labels
-    bg_method:          Which method to use when adding bacground
+    bg_method:          Which method to use when adding background
                         ('none', 'copy_paste', 'black', 'white', 'alpha_blend', 'random')
     show_progress:      Print progress while generating
     enable_print:       Enable disable all prints, overwrites "show progress"
@@ -27,7 +44,11 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
     image_dir:          Name of output subfolder for images
     depth_dir:          Name of output subfolder for depth images
     box_dir:            Name of output subfolder for box labels
-    mask_dir:           Name of output subfolder for mask labels'''
+    mask_dir:           Name of output subfolder for mask labels
+    
+    val_persentage:     Presentage of validation images
+    train_dir_name:     Name of training directory
+    val_dir_name:       Name of validation directory'''
 
 
     if 0 >= n_imgs or not type(n_imgs) == int:                  # Number of images should be int and positive
@@ -36,23 +57,24 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
     if not os.path.isfile(model_path):                          # Ensures that model path points to file
         raise Exception('Model path dont point to a file: {}'.format(model_path))
 
-    if not os.path.isdir(output_path):                          # Ensures that output folder path is folder
-        raise Exception('Output path is not a directory: {}'.format(output_path))
-    
-    if not os.path.isdir(os.path.join(output_path, image_dir)): # Ensure image folder exists
-        raise Exception('Missing "{}" output folder'.format(image_dir))
+    if os.path.isdir(output_path):                              # Ensures that output folder path is folder
+        raise Exception('Output folder already exists: {}'.format(output_path))
+    else: os.mkdir(output_path)
 
-                                                                # Ensure depth image folder exists
-    if depth_img and not os.path.isdir(os.path.join(output_path, depth_dir)):
-        raise Exception('Missing "{}" output folder'.format(depth_dir))
+    print(image_dir, depth_dir, box_dir, mask_dir)
 
-                                                                # Ensure box label folder exists
-    if box_label and not os.path.isdir(os.path.join(output_path, box_dir)):
-        raise Exception('Missing "{}" output folder'.format(box_dir))
+    for parent_dir in train_dir_name, val_dir_name:             # Create train and validation directory
+        parent_dir_path = os.path.join(output_path, parent_dir) # Output parent directories
+        os.mkdir(parent_dir_path)                               # Create directories
+
+                                                                # Create sub-folder if they are selected
+        for sub_dir, b in zip((image_dir, depth_dir, box_dir, mask_dir), (True, depth_img, box_label, mask_label)):
+            if b:  
+                sub_dir_path = os.path.join(parent_dir_path, sub_dir)
+                sub_dir = sub_dir_path
+                os.mkdir(sub_dir_path)
     
-                                                                # Ensure depth image folder exists
-    if mask_label and not os.path.isdir(os.path.join(output_path, mask_dir)):
-        raise Exception('Missing "{}" output folder'.format(mask_dir))
+    print(image_dir, depth_dir, box_dir, mask_dir)
 
     if enable_print:                                            # Print configuration
         print('\n'.join((
@@ -83,11 +105,17 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
         s_handler.generate_new_random_scene()                   # Generate new random scene
         s_handler.create_new_renderer()                         # Creates a new renderer
 
+        parent_output_dir = ''
+        if (n_imgs*val_persentage) > i:                         # Create validation set
+            parent_output_dir = os.path.join(output_path, val_dir_name)
+        else:                                                   # Create training set
+            parent_output_dir = os.path.join(output_path, train_dir_name)
+
         if True:                                                # RGB images
             img = s_handler.get_img(bg_method)
             size = saver.save_pil_img(
                 pil_img=img,
-                folder=os.path.join(output_path, image_dir),
+                folder=os.path.join(parent_output_dir, image_dir),
                 name='image{}.jpg'.format(i)
             )
             sizes = np.append(sizes, size)
@@ -96,13 +124,11 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
             img = s_handler.get_depth()
             size = saver.save_pil_img(
                 pil_img=img,
-                folder=os.path.join(output_path, depth_dir),
+                folder=os.path.join(parent_output_dir, depth_dir),
                 name='depth{}.jpg'.format(i)
             )
             sizes = np.append(sizes, size)
 
-        
-        points = None   # Save points for debug
         if box_label:                                           # Box labels
             box = s_handler.get_box(
                 class_name=model_name,
@@ -110,7 +136,7 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
             )
             size = saver.save_txt(
                 dic=box,
-                folder=os.path.join(output_path, box_dir),
+                folder=os.path.join(parent_output_dir, box_dir),
                 name='image{}.txt'.format(i)
             )
             sizes = np.append(sizes, size)
@@ -119,7 +145,7 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
             mask = s_handler.get_mask()
             size = saver.save_pil_img(
                 pil_img=mask,
-                folder=os.path.join(output_path, mask_dir),
+                folder=os.path.join(parent_output_dir, mask_dir),
                 name='mask{}.jpg'.format(i)
             )
             sizes = np.append(sizes, size)
@@ -174,11 +200,11 @@ def generate_dataset(n_imgs:int, model_path:str, output_path:str, model_name:str
 
         print('Starting image preview of {} image(s):'.format(n_preview_images))
         visualizer.show_images(
-            img_path=os.path.join(output_path, image_dir),
-            depth_path=os.path.join(output_path, depth_dir) if depth_img else None,
+            img_path=os.path.join(parent_output_dir, image_dir),
+            depth_path=os.path.join(parent_output_dir, depth_dir) if depth_img else None,
 
-            box_path=os.path.join(output_path, box_dir) if box_label else None,
-            mask_path=os.path.join(output_path, mask_dir) if mask_label else None,
+            box_path=os.path.join(parent_output_dir, box_dir) if box_label else None,
+            mask_path=os.path.join(parent_output_dir, mask_dir) if mask_label else None,
 
             n = n_preview_images,
 

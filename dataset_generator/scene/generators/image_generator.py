@@ -14,7 +14,13 @@ def _create_img(scene, renderer, bg_color):
 def _get_rand_img(folder):
     '''Returns random image from folder path'''
     bg_path = os.path.join(os.getcwd(), folder)                             # Get full folder path
-    bg_img_name = random.choice(os.listdir(bg_path))                        # List images in directory
+    images_filtered = list(filter(lambda x: x.endswith((                    # Filter images
+        '.jpg',
+        '.png',
+        '.jpeg'
+    )), os.listdir(bg_path)))
+
+    bg_img_name = random.choice(images_filtered)                            # List images in directory
     return Image.open(os.path.join(bg_path, bg_img_name))                   # Open random image
 
 
@@ -62,8 +68,18 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
         scene_img = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
 
 
-        alpha = int(bg_method.split(':')[1]) if ':' in bg_method else .2    # Get alpha value from input
-        img = Image.blend(scene_img, bg_img, alpha=alpha)
+        alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2    # Get alpha value from input
+        try: img = Image.blend(scene_img, bg_img, alpha=alpha)
+        except Exception as e:
+            print('\n\n')
+            print(bg_img.mode)
+            print(scene_img.mode)
+            print('\n\n')
+
+            bg_img.show()
+            scene_img.show()
+
+            raise e
 
     elif 'copy_paste'==bg_method:
         bg_img = _get_rand_img(bg_images)                                   # Get random background image
