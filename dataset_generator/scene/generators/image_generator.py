@@ -67,8 +67,8 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
         scene_img = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
 
-
-        alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2    # Get alpha value from input
+                                                                            # Get alpha value from input, else random
+        alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2
         try: img = Image.blend(scene_img, bg_img, alpha=alpha)
         except Exception as e:
             print('\n\n')

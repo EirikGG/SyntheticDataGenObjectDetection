@@ -61,8 +61,6 @@ def generate_dataset(
         raise Exception('Output folder already exists: {}'.format(output_path))
     else: os.mkdir(output_path)
 
-    print(image_dir, depth_dir, box_dir, mask_dir)
-
     for parent_dir in train_dir_name, val_dir_name:             # Create train and validation directory
         parent_dir_path = os.path.join(output_path, parent_dir) # Output parent directories
         os.mkdir(parent_dir_path)                               # Create directories
@@ -73,8 +71,6 @@ def generate_dataset(
                 sub_dir_path = os.path.join(parent_dir_path, sub_dir)
                 sub_dir = sub_dir_path
                 os.mkdir(sub_dir_path)
-    
-    print(image_dir, depth_dir, box_dir, mask_dir)
 
     if enable_print:                                            # Print configuration
         print('\n'.join((
