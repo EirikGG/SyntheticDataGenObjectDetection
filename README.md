@@ -1,3 +1,2 @@
 # CAD-depth-images-generation
-Generate realistic dataset of depth images from CAD models
-
+Generate dataset of depth images from 3D-models.
