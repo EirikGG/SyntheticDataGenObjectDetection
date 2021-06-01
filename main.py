@@ -2,17 +2,17 @@ import os
 
 from dataset_generator import dataset_generator
 
-models = ('musicAngle3', )
 models = ('test_object_rect_100_50_20', )
+models = ('musicAngle3', )
 
 for model in models:
     model_path = os.path.join(os.getcwd(), 'assets', f'{model}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=12000,
+        n_imgs=100,
         model_path=model_path,
         output_path=f'out_{model}',
-        model_name='0',
+        model_name='1',
      
         image_dir='images',       
         depth_img=False,
@@ -21,7 +21,7 @@ for model in models:
         box_dir='labels',
         mask_label=False,
         
-        bg_method='random_mix',
+        bg_method='color',
         
         show_progress=True,
         enable_print=True,

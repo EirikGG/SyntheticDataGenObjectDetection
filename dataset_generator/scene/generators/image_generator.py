@@ -42,9 +42,9 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
             col_arr = list(map(int, col_str.split(',')))
 
             img = _create_img(scene, renderer, col_arr)
-        except:
-            raise Exception('Color not formated correctly (color: r,g,b), ex: "color:255,255,255"')
-
+        except:     # No color specified, use random color
+            col_arr = np.random.randint(low = 0, high = 255, size=3)
+            img = _create_img(scene, renderer, col_arr)
     
     elif 'random'==bg_method:
         scene_img = _create_img(scene, renderer, (0, 0, 0, 0)).convert('RGB')

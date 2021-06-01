@@ -33,16 +33,16 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
             point = np.dot(point, obj_pose.T)                   # Add object rotation/translation to point
             p_2d = np.dot(point, projection_mat)                # Use camera projection matrix to convert to image coordinates
 
-            #if 0 < p_2d[-1] and p_2d[-1] < 2:                   # Check w is between zero and one
-            p_2d = p_2d / p_2d[-1]                          # Divide the array by w
+            #if 0 < p_2d[-1] and p_2d[-1] < 2:                  # Check w is between zero and one
+            p_2d = p_2d / p_2d[-1]                              # Divide the array by w
             
-            x = round(((p_2d[0] + 1.0)/2.0)*width)          # X pixel coodinate
+            x = round(((p_2d[0] + 1.0)/2.0)*width)              # X pixel coodinate
             if l > x:
                 l = x
             if r < x:
                 r = x
 
-                                                            # Y pixel coordinate
+                                                                # Y pixel coordinate
             y = round(height - ((p_2d[1] + 1.0)/2.0)*height)
             if t > y:
                 t = y
@@ -71,16 +71,23 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
             str(-1),                                                # Score (used for submission)
         ))
     elif 'yolo' == bbox_format:
-        vs = (                                                      # Coordinates in yolo format: class x_center y_center width height
-            (l + (r-l)/2) / width,
-            (t + (b-t)/2) / height,
-            (r-l) / width,
-            (b-t) / height,
-        )
+        x = (l + (r-l)/2) / width
+        y = (t + (b-t)/2) / height
+        x_span = (r-l) / width
+        y_span = (b-t) / height
 
-        vs = [max(min(v, 1), 0) for v in vs]                        # Map values from 0 - 1
-        vs = map(str, vs)                                           # Cast values to string
-        res = ' '.join((class_name, *vs))                           # Assemble final string with id
+        res = ''
+        if 0 < x + x_span/2 and x - x_span/2 < width:
+            if  0 < y + y_span/2 and y - y_span/2 < height:
+
+                vs = ( x, y, x_span, y_span)                        # Coordinates in yolo format: class x_center y_center width height
+
+                vs = [                                              # Add class name and map values from 0 - 1
+                    class_name, 
+                    *map(str, [max(min(v, 1), 0) for v in vs])
+                ]
+                
+                res = ' '.join(map(str, vs))
         
     else: raise Exception(f'Invalid bbox format {bbox_format}')
 

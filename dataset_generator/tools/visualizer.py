@@ -57,18 +57,19 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3, b
             with open(os.path.join(bp, box)) as f:                  # Read file
                 bbox = f.read().split()                             # Load text
             
-            x, y, w, h = get_coord(bbox, bbox_format, img_arr.shape)
+            if bbox:
+                x, y, w, h = get_coord(bbox, bbox_format, img_arr.shape)
 
-            rect = patches.Rectangle(                               # Create new rectangle
-                (x, y),
-                w,                                                  # Width
-                h,                                                  # Height
-                linewidth=1,
-                edgecolor='r',
-                facecolor='none'
-            )
-            axarr[1, 0].add_patch(rect)                             # Add rectangle to subplot
-            axarr[1, 0].title.set_text('Box label: {}'.format(box)) # Add title to subplot
+                rect = patches.Rectangle(                               # Create new rectangle
+                    (x, y),
+                    w,                                                  # Width
+                    h,                                                  # Height
+                    linewidth=1,
+                    edgecolor='r',
+                    facecolor='none'
+                )
+                axarr[1, 0].add_patch(rect)                             # Add rectangle to subplot
+                axarr[1, 0].title.set_text('Box label: {}'.format(box)) # Add title to subplot
 
         if depth_path:                                              # Print deph image
             dp = get_full_path(depth_path)                          # Depth image folder
