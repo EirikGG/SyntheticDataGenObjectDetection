@@ -2,17 +2,25 @@ import os
 
 from dataset_generator import dataset_generator
 
-models = ('test_object_rect_100_50_20', )
-models = ('musicAngle3', )
+models = (
+    dict(
+        model_name='musicAngle3',
+        cls = '0'
+        ),
+    dict(
+        model_name='test_object_rect_100_50_20',
+        cls = '1'
+    )
+)
 
 for model in models:
-    model_path = os.path.join(os.getcwd(), 'assets', f'{model}.obj')
+    model_path = os.path.join(os.getcwd(), 'assets', f'{model["model_name"]}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=100,
+        n_imgs=10000,
         model_path=model_path,
-        output_path=f'out_{model}',
-        model_name='1',
+        output_path=f'out_{model["model_name"]}',
+        model_name=model['cls'],
      
         image_dir='images',       
         depth_img=False,
@@ -21,13 +29,13 @@ for model in models:
         box_dir='labels',
         mask_label=False,
         
-        bg_method='color',
+        bg_method='random_mix',
         
         show_progress=True,
         enable_print=True,
         
-        img_visualizer=True,
-        n_preview_images=3,
+        img_visualizer=False,
+        n_preview_images=5,
 
-        val_persentage=.1
+        val_persentage=.2
     )
