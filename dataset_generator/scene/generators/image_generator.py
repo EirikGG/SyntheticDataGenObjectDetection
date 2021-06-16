@@ -10,7 +10,7 @@ def _create_img(scene, renderer, bg_color, mode='RGB'):
         scene,
         pyrender.RenderFlags.RGBA if 'RGBA'==mode else pyrender.RenderFlags.NONE
     )
-    return Image.fromarray(color.astype('uint8'), mode), depth              # Convert from point cloud to pil image
+    return Image.fromarray(color, mode), depth              # Convert from point cloud to pil image.astype('uint8'), mode
 
 def _get_rand_img(folder):
     '''Returns random image from folder path'''
@@ -64,10 +64,10 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
     elif 'alpha_blend'in bg_method:
         bg_img = _get_rand_img(bg_images)
 
+
         renderer.viewport_height = bg_img.size[1]                           # Match height dimension
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
         scene_img, _ = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
-
                                                                             # Get alpha value from input, else random
         alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2
         try: img = Image.blend(scene_img, bg_img, alpha=alpha)
@@ -90,10 +90,9 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
         scene_img, depth = _create_img(                                     # Get scene image
             scene,
             renderer,
-            bg_color=(255, 255, 255, 0),
+            bg_color=(0, 0, 0, 0),
             mode='RGBA'
         )
-
         
         img = Image.alpha_composite(bg_img.convert("RGBA"), scene_img)                  # Combine images
 

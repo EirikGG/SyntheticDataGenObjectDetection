@@ -17,13 +17,13 @@ models = (
     )
 )
 
-models = [models[-1]]
+models = [models[0]]
 
 for model in models:
     model_path = os.path.join(os.getcwd(), 'assets', f'{model["model_name"]}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=10,
+        n_imgs=1200,
         model_path=model_path,
         output_path=f'out_{model["model_name"]}',
         model_name=model['cls'],
@@ -35,7 +35,7 @@ for model in models:
         box_dir='labels',
         mask_label=False,
         
-        bg_method='copy_paste',
+        bg_method='color',
         
         show_progress=True,
         enable_print=True,
@@ -43,5 +43,5 @@ for model in models:
         img_visualizer=True,
         n_preview_images=3,
 
-        val_persentage=.2
+        val_persentage=.167
     )
