@@ -37,17 +37,19 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
             p_2d = p_2d / p_2d[-1]                              # Divide the array by w
             
             x = round(((p_2d[0] + 1.0)/2.0)*width)              # X pixel coodinate
-            if l > x:
-                l = x
-            if r < x:
-                r = x
+            if 0 < x and x < width:
+                if l > x:
+                    l = x
+                if r < x:
+                    r = x
 
                                                                 # Y pixel coordinate
             y = round(height - ((p_2d[1] + 1.0)/2.0)*height)
-            if t > y:
-                t = y
-            if b < y:
-                b = y
+            if 0 < y and y < height:
+                if t > y:
+                    t = y
+                if b < y:
+                    b = y
 
     res = ''
 
@@ -76,10 +78,10 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
         x_span = (r-l) / width
         y_span = (b-t) / height
 
-        res = ''
-        if 0 < x + x_span/2 and x - x_span/2 < width:
-            if  0 < y + y_span/2 and y - y_span/2 < height:
-
+        
+        if 0 < x + x_span/4 and x - x_span/4 < width:
+            if  0 < y + y_span/4 and y - y_span/4 < height:
+        
                 vs = ( x, y, x_span, y_span)                        # Coordinates in yolo format: class x_center y_center width height
 
                 vs = [                                              # Add class name and map values from 0 - 1

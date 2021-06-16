@@ -4,12 +4,13 @@ import numpy as np
 
 from PIL import Image
 
-def _create_img(scene, renderer, bg_color):
+def _create_img(scene, renderer, bg_color, mode='RGB'):
     scene.bg_color = bg_color
-    color, _ = renderer.render(                                             # Get image
+    color, depth = renderer.render(                                         # Get image
         scene,
-    )                                       
-    return Image.fromarray(color.astype('uint8'), 'RGB')                    # Convert from point cloud to pil image
+        pyrender.RenderFlags.RGBA if 'RGBA'==mode else pyrender.RenderFlags.NONE
+    )
+    return Image.fromarray(color.astype('uint8'), mode), depth              # Convert from point cloud to pil image
 
 def _get_rand_img(folder):
     '''Returns random image from folder path'''
@@ -41,10 +42,10 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
             col_str = bg_method.split(':')[1]
             col_arr = list(map(int, col_str.split(',')))
 
-            img = _create_img(scene, renderer, col_arr)
+            img, _ = _create_img(scene, renderer, col_arr)
         except:     # No color specified, use random color
             col_arr = np.random.randint(low = 0, high = 255, size=3)
-            img = _create_img(scene, renderer, col_arr)
+            img, _ = _create_img(scene, renderer, col_arr)
     
     elif 'random'==bg_method:
         scene_img = _create_img(scene, renderer, (0, 0, 0, 0)).convert('RGB')
@@ -65,7 +66,7 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
 
         renderer.viewport_height = bg_img.size[1]                           # Match height dimension
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
-        scene_img = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
+        scene_img, _ = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
 
                                                                             # Get alpha value from input, else random
         alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2
@@ -86,14 +87,17 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
 
         renderer.viewport_height = bg_img.size[1]                           # Match height dimension
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
-        scene_img = _create_img(scene, renderer, (255, 255, 255))           # Get scene image
+        scene_img, depth = _create_img(                                     # Get scene image
+            scene,
+            renderer,
+            bg_color=(255, 255, 255, 0),
+            mode='RGBA'
+        )
+
         
-        # https://stackoverflow.com/questions/56942102/how-to-generate-a-mask-using-pillows-image-load-function
-        scene_arr = np.array(scene_img)
-        mask_arr = scene_arr[:,:,2] < 255
-        mask_img = Image.fromarray((mask_arr*255).astype(np.uint8)).convert('L')
-        
-        img = Image.composite(scene_img, bg_img, mask_img)                  # Combine images
+        img = Image.alpha_composite(bg_img.convert("RGBA"), scene_img)                  # Combine images
+
+        img = img.convert("RGB")
 
     else:
         raise('Bacground method not recognized', bg_method)
