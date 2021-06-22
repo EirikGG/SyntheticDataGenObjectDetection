@@ -3,6 +3,7 @@ import pyrender, os, random
 import numpy as np
 
 from PIL import Image
+from dataset_generator.tools import create_bg
 
 def _create_img(scene, renderer, bg_color, mode='RGB'):
     scene.bg_color = bg_color
@@ -10,20 +11,7 @@ def _create_img(scene, renderer, bg_color, mode='RGB'):
         scene,
         pyrender.RenderFlags.RGBA if 'RGBA'==mode else pyrender.RenderFlags.NONE
     )
-    return Image.fromarray(color, mode), depth              # Convert from point cloud to pil image.astype('uint8'), mode
-
-def _get_rand_img(folder):
-    '''Returns random image from folder path'''
-    bg_path = os.path.join(os.getcwd(), folder)                             # Get full folder path
-    images_filtered = list(filter(lambda x: x.endswith((                    # Filter images
-        '.jpg',
-        '.png',
-        '.jpeg'
-    )), os.listdir(bg_path)))
-
-    bg_img_name = random.choice(images_filtered)                            # List images in directory
-    return Image.open(os.path.join(bg_path, bg_img_name))                   # Open random image
-
+    return Image.fromarray(color, mode) # Convert from point cloud to pil image.astype('uint8'), mode
 
 def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
     '''Takes a rendered image from the scene'''
@@ -45,15 +33,12 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
             img, _ = _create_img(scene, renderer, col_arr)
         except:     # No color specified, use random color
             col_arr = np.random.randint(low = 0, high = 255, size=3)
-            img, _ = _create_img(scene, renderer, col_arr)
+            img = _create_img(scene, renderer, col_arr)
     
     elif 'random'==bg_method:
         scene_img = _create_img(scene, renderer, (0, 0, 0, 0)).convert('RGB')
 
-        # https://stackoverflow.com/questions/59056216/how-do-you-generate-an-image-where-each-pixel-is-a-random-color-in-python
-        w,h = scene_img.size
-        rand_arr = np.random.randint(low = 0, high = 255, size=(h, w, 3))
-        rand_img = Image.fromarray(rand_arr.astype('uint8')).convert('RGB') # Create image of rnadom color
+        rand_img = create_bg.get_color_noise((*scene_img.size, 3))
 
         # https://stackoverflow.com/questions/56942102/how-to-generate-a-mask-using-pillows-image-load-function
         scene_arr = np.array(scene_img)
@@ -62,12 +47,12 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
         img = Image.composite(scene_img, rand_img, mask_img)                # Combine images
 
     elif 'alpha_blend'in bg_method:
-        bg_img = _get_rand_img(bg_images)
+        bg_img = create_bg.get_rand_img(bg_images)
 
 
         renderer.viewport_height = bg_img.size[1]                           # Match height dimension
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
-        scene_img, _ = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
+        scene_img = _create_img(scene, renderer, (255//2,255//2,255//2,0))  # Create image of model
                                                                             # Get alpha value from input, else random
         alpha = int(bg_method.split(':')[-1]) if ':' in bg_method else .2
         try: img = Image.blend(scene_img, bg_img, alpha=alpha)
@@ -83,18 +68,18 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
             raise e
 
     elif 'copy_paste'==bg_method:
-        bg_img = _get_rand_img(bg_images)                                   # Get random background image
+        bg_img = create_bg.get_rand_img(bg_images)                          # Get random background image
 
         renderer.viewport_height = bg_img.size[1]                           # Match height dimension
         renderer.viewport_width = bg_img.size[0]                            # Match width dimension
-        scene_img, depth = _create_img(                                     # Get scene image
+        scene_img = _create_img(                                            # Get scene image
             scene,
             renderer,
             bg_color=(0, 0, 0, 0),
             mode='RGBA'
         )
         
-        img = Image.alpha_composite(bg_img.convert("RGBA"), scene_img)                  # Combine images
+        img = Image.alpha_composite(bg_img.convert("RGBA"), scene_img)      # Combine images
 
         img = img.convert("RGB")
 
