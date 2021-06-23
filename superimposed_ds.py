@@ -1,4 +1,4 @@
-import os, random
+import os, random, time
 
 import numpy as np
 
@@ -7,19 +7,20 @@ from PIL.ExifTags import TAGS
 
 from dataset_generator.tools import create_bg
 
-folder_path = 'N:\\TestObjects\\Meshroom-2021.1.0-win64\\speaker\\speaker_img6'
+folder_path = '/home/eirikgg/Downloads/speaker_img6'
 
-output_path = 'C:\\Users\\Eirik\\OneDrive\\school\\Simulation and Visualization\\4.semester\\Master_project\\s1_generate_dataset\\code\\test'
+output_path = '/home/eirikgg/msc/yolov5Dir/superimposed_speaker'
 
 
-n_imgs = 10
-val_ratio = .2
+n_imgs = 1200
+val_ratio = .166666667
 
-DEBUG = True
+DEBUG = False
 
 images = tuple(filter(lambda x: x.endswith('.jpg'), os.listdir(folder_path)))
 
-for i in range(10):
+t0 = time.time()
+for i in range(n_imgs):
     basename = random.choice(images).split(".")[:-1]
 
     img = Image.open(os.path.join(folder_path, f'{"".join(basename)}{".jpg"}'))
@@ -37,12 +38,13 @@ for i in range(10):
     elif 3 == method:
         bg_img = create_bg.get_color_noise(img.size)
 
-
-    size = random.randint(100, 500)
+    bg_x_size = bg_img.size[1]
+    size = random.randint(int(bg_x_size*.1), int(bg_x_size*.4))
     img = img.resize((size, size))
     lbl = lbl.resize((size, size))
 
     white_px = np.where(255 == np.array(lbl))
+    if not white_px: continue
     x0, x1 = min(white_px[1]), max(white_px[1])
     y0, y1 = min(white_px[0]), max(white_px[0])
 
@@ -67,8 +69,15 @@ for i in range(10):
         )
         bg_img.show()
 
-    yolo_lbl = f'{"0"} {x+cropped.size[0]//2} {y+cropped.size[1]//2} {x1-x0} {y1-y0}'
+    yolo_lbl = (
+        (x+cropped.size[0]//2)/bg_img.size[1],
+        (y+cropped.size[1]//2)/bg_img.size[0],
+        (x1-x0)/bg_img.size[1],
+        (y1-y0)/bg_img.size[0]
+    )
 
+    
+    yolo_lbl = " ".join(("0", *map(lambda x: str(max(0, min(x, 1))), yolo_lbl)))
 
     out = ''
     if i < n_imgs*val_ratio:
@@ -85,3 +94,5 @@ for i in range(10):
     bg_img.save(os.path.join(img_out, f'image{i}.jpg'))
 
     with open(os.path.join(val_out, f'image{i}.txt'), 'w') as f: f.writelines(yolo_lbl)
+
+print(f'Finished in {time.time() - t0} seconds')
