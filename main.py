@@ -14,20 +14,16 @@ models = (
     dict(
         model_name = 'green_rect',
         cls = '2'
-    ),
-    dict(
-        model_name = 'test_object_rect_100_50_20_texture',
-        cls = '3'
     )
 )
 
-models = [models[-1]]
+#models = [models[0]]
 
 for model in models:
     model_path = os.path.join(os.getcwd(), 'assets', f'{model["model_name"]}.obj')
 
     dataset_generator.generate_dataset(
-        n_imgs=12,
+        n_imgs=10000,
         model_path=model_path,
         output_path=f'out_{model["model_name"]}',
         model_name=model['cls'],
@@ -39,13 +35,13 @@ for model in models:
         box_dir='labels',
         mask_label=False,
         
-        bg_method='random_mix',
+        bg_method='copy_paste',
         
         show_progress=True,
         enable_print=True,
         
-        img_visualizer=True,
+        img_visualizer=False,
         n_preview_images=3,
 
-        val_persentage=.167
+        val_persentage=.2
     )

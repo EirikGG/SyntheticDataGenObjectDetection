@@ -16,9 +16,9 @@ def get_rand_img(folder):
     bg_img_name = random.choice(images_filtered)                            # List images in directory
     return Image.open(os.path.join(bg_path, bg_img_name))                   # Open random image
 
-def get_color_noise(image_size):
+def get_color_noise(width, height):
     # https://stackoverflow.com/questions/59056216/how-do-you-generate-an-image-where-each-pixel-is-a-random-color-in-python
-    rand_arr = np.random.randint(low = 0, high = 255, size=image_size)
+    rand_arr = np.random.randint(low = 0, high = 255, size=(height, width, 3))
     return Image.fromarray(rand_arr.astype('uint8')).convert('RGB') # Create image of rnadom color
 
 def get_color_img(image_size, color=None):

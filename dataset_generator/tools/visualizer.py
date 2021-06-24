@@ -54,6 +54,7 @@ def show_images(img_path, depth_path=None, box_path=None, mask_path=None, n=3, b
             bp = get_full_path(box_path)                            # Path to box dir
             
             box = sorted(os.listdir(bp))[i]                         # Pick same box as image
+            print(img, box)
             with open(os.path.join(bp, box)) as f:                  # Read file
                 bbox = f.read().split()                             # Load text
             

@@ -86,7 +86,7 @@ def get_box(scene, renderer, model_node, class_name, bbox_format):
 
                 vs = [                                              # Add class name and map values from 0 - 1
                     class_name, 
-                    *map(str, [max(min(v, 1), 0) for v in vs])
+                    *map(str, vs)
                 ]
                 
                 res = ' '.join(map(str, vs))

@@ -38,7 +38,11 @@ def get_img(scene, renderer, bg_method:str, bg_images:str='bg_images'):
     elif 'random'==bg_method:
         scene_img = _create_img(scene, renderer, (0, 0, 0, 0)).convert('RGB')
 
-        rand_img = create_bg.get_color_noise((*scene_img.size, 3))
+        width, height = scene_img.size
+        rand_img = create_bg.get_color_noise(width, height)
+
+        renderer.viewport_height = rand_img.size[1]                         # Match height dimension
+        renderer.viewport_width = rand_img.size[0]                          # Match width dimension
 
         # https://stackoverflow.com/questions/56942102/how-to-generate-a-mask-using-pillows-image-load-function
         scene_arr = np.array(scene_img)
